@@ -1,0 +1,1 @@
+docker build -t calc-tests-img . && docker run --name calc-tests-run calc-tests-img > run-out.txt && docker rm calc-tests-run && docker image rm calc-tests-img
