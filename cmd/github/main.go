@@ -11,45 +11,21 @@ import (
 	"grader/api/router"
 	"grader/db"
 	"grader/server"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func main() {
 	ctx := context.Background()
-	client, err := setupMongoDB(ctx)
-	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
-			log.Fatal(err)
-		}
-	}()
+	client, err := db.Connect(ctx)
+	if err != nil {
+		log.Fatalf("failed to connect to mongodb: %s", err)
+	}
+	log.Println("connected to mongodb...")
 
 	assignmentsDBHandler := db.NewAssignmentsHandler(client)
 	assignmentsHTTPHandler := api.NewAssignmentsHandler(assignmentsDBHandler)
 
-	server := server.New("localhost:8080", router.New(assignmentsHTTPHandler))
-
-	// go func() {
-	// 	time.Sleep(5 * time.Second)
-	// 	server.Stop()
-	// }()
-
+	server := server.New("localhost:8080", router.New(assignmentsHTTPHandler), client)
 	server.Start()
-}
-
-func setupMongoDB(ctx context.Context) (*mongo.Client, error) {
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		return nil, err
-	}
-
-	if err = client.Ping(ctx, readpref.Primary()); err != nil {
-		return nil, err
-	}
-
-	return client, nil
 }
 
 func runTests(w http.ResponseWriter, r *http.Request) {
