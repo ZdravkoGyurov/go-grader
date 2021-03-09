@@ -8,9 +8,10 @@ ENV ASSIGNMENT ${assignment}
 WORKDIR /app
 
 COPY ./go.mod /app/go.mod
+COPY ./go.sum /app/go.sum
 COPY ./tests/${assignment}/* /app/${assignment}/
 
-RUN apk update && apk upgrade && apk add --no-cache git
+RUN apk update && apk upgrade && apk add --no-cache git docker-cli
 
 RUN git clone https://github.com/${gitUser}/${gitRepo}.git
 RUN mv ${gitRepo}/${assignment}/* /app/${assignment}/

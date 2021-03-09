@@ -15,8 +15,8 @@ const (
 )
 
 func main() {
-	exec, close := executor.New(maxWorkers)
-	defer close()
+	exec, stop := executor.New(maxWorkers)
+	defer stop()
 
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		f := func() {
@@ -31,7 +31,7 @@ func main() {
 		fmt.Fprintf(w, "%s", jobID)
 	})
 	http.HandleFunc("/bye", func(w http.ResponseWriter, r *http.Request) {
-		go close()
+		go stop()
 		fmt.Fprintf(w, "stopped executor, but finishing queued jobs")
 	})
 	http.ListenAndServe("localhost:8080", nil)
