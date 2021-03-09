@@ -2,6 +2,8 @@ package api
 
 import (
 	"fmt"
+	"grader/docker"
+	"grader/random"
 	"log"
 	"net/http"
 )
@@ -29,9 +31,16 @@ func NewTestRunHandler(executor executor) *TestRunHandler {
 func (h *TestRunHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	// ctx := request.Context()
 
-	jobName := "run tests"
+	jobName := "run tests in docker"
 	jobFunc := func() {
-		fmt.Println("simulating execution of tests run")
+		imageName := random.String()
+		containerName := random.String()
+		output, err := docker.ExecuteTests(imageName, containerName)
+		if err != nil {
+			log.Println(err) // log status in db
+			return
+		}
+		log.Println(">>>", output) // log status in db
 	}
 	jobID, err := h.executor.EnqueueJob(jobName, jobFunc)
 	if err != nil {
