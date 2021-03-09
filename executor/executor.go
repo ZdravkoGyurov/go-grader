@@ -17,15 +17,16 @@ type job struct {
 	f    func()
 }
 
-type executor struct {
+// Executor ...
+type Executor struct {
 	wg      sync.WaitGroup
 	jobs    chan job
 	stopped bool
 }
 
 // New creates an executor with workers
-func New(workers int) (e *executor, stop func()) {
-	e = &executor{
+func New(workers int) (e *Executor, stop func()) {
+	e = &Executor{
 		wg:      sync.WaitGroup{},
 		jobs:    make(chan job, maxConcurrentJobs),
 		stopped: false,
@@ -38,8 +39,8 @@ func New(workers int) (e *executor, stop func()) {
 	return e, e.stop
 }
 
-// QueueJob ...
-func (e *executor) EnqueueJob(name string, f func()) (id string, err error) {
+// EnqueueJob ...
+func (e *Executor) EnqueueJob(name string, f func()) (id string, err error) {
 	if e.stopped {
 		return "", errors.New("executor is stopped")
 	}
@@ -60,7 +61,7 @@ func (e *executor) EnqueueJob(name string, f func()) (id string, err error) {
 	}
 }
 
-func (e *executor) startWorker() {
+func (e *Executor) startWorker() {
 	defer e.wg.Done()
 
 	for job := range e.jobs {
@@ -70,7 +71,7 @@ func (e *executor) startWorker() {
 	}
 }
 
-func (e *executor) stop() {
+func (e *Executor) stop() {
 	e.stopped = true
 	close(e.jobs)
 	e.wg.Wait()
