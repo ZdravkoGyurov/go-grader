@@ -37,10 +37,5 @@ func main() {
 
 	app := app.New(stopExecutor, "localhost:8080", httpRouter, dbClient)
 
-	// go func() {
-	// 	time.Sleep(5 * time.Second)
-	// 	app.Stop()
-	// }()
-
 	app.Start()
 }
