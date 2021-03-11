@@ -23,11 +23,8 @@ jobs:
       with:
         go-version: 1.15
 
-#     - name: Build
-#       run: go build -v ./...
+    - name: Build
+      run: go build -v ./...
 
-#     - name: Test
-#       run: go test -v ./...
-      
-    - name: Test App
-      run: go test -v app/app_test.go
+    - name: Test
+      run: go test -v ./...
