@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
-	"grader/docker"
-	"grader/random"
 	"log"
 	"net/http"
+
+	"grader/docker"
+	"grader/random"
 )
 
 type testRunDBHandler interface {

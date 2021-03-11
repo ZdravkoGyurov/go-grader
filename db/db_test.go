@@ -1,10 +1,11 @@
 package db_test
 
 import (
-	"context"
-	"grader/db"
 	"testing"
 	"time"
+
+	"grader/app/config"
+	"grader/db"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,21 +18,18 @@ func TestBooks(t *testing.T) {
 
 var _ = Describe("DB", func() {
 	var (
-		ctx    context.Context
-		cancel context.CancelFunc
+		cfg config.Config
 	)
 
 	BeforeSuite(func() {
-		ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
-	})
-
-	AfterSuite(func() {
-		cancel()
+		cfg = config.Config{
+			DBConnectTimeout: 30 * time.Second,
+		}
 	})
 
 	Describe("Connecting to mongo DB", func() {
 		It("Should connect and ping successfully", func() {
-			_, err := db.Connect(ctx)
+			_, err := db.Connect(cfg)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
