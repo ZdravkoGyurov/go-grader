@@ -2,12 +2,16 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"grader/app/config"
+	"grader/executor"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -17,14 +21,16 @@ import (
 
 // Application ...
 type Application struct {
-	stopExecutor func()
+	cfg          config.Config
+	stopExecutor executor.StopFunc
 	server       *http.Server
 	done         chan os.Signal
 	dbClient     *mongo.Client
 }
 
 // New ...
-func New(stopExecutor func(), address string, handler http.Handler, dbClient *mongo.Client) *Application {
+func New(cfg config.Config, stopExecutor executor.StopFunc, handler http.Handler, dbClient *mongo.Client) *Application {
+	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	server := &http.Server{
 		Addr:    address,
 		Handler: handler,
@@ -34,6 +40,7 @@ func New(stopExecutor func(), address string, handler http.Handler, dbClient *mo
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	return &Application{
+		cfg:          cfg,
 		stopExecutor: stopExecutor,
 		server:       server,
 		done:         done,
@@ -52,19 +59,20 @@ func (s *Application) Start() {
 
 	<-s.done
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer func() {
 		s.stopExecutor()
 		log.Println("stopped job executor")
 
+		ctx, cancel := context.WithTimeout(context.Background(), s.cfg.DBDisconnectTimeout)
+		defer cancel()
 		if err := s.dbClient.Disconnect(ctx); err != nil {
 			log.Fatalf("failed to disconnect from mongodb: %s", err)
 		}
 		log.Println("disconnected from mongodb")
-
-		cancel()
 	}()
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	if err := s.server.Shutdown(ctx); err != nil {
 		log.Fatalf("failed to shutdown http server: %s\n", err)
 	}

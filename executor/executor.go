@@ -2,14 +2,14 @@ package executor
 
 import (
 	"errors"
+	"grader/app/config"
 	"grader/random"
 	"log"
 	"sync"
 )
 
-const (
-	maxConcurrentJobs = 100
-)
+// StopFunc ...
+type StopFunc = func()
 
 type job struct {
 	id   string
@@ -25,14 +25,14 @@ type Executor struct {
 }
 
 // New creates an executor with workers
-func New(workers int) (e *Executor, stop func()) {
-	e = &Executor{
+func New(config config.Config) (*Executor, StopFunc) {
+	e := &Executor{
 		wg:      sync.WaitGroup{},
-		jobs:    make(chan job, maxConcurrentJobs),
+		jobs:    make(chan job, config.MaxExecutorConcurrentJobs),
 		stopped: false,
 	}
-	e.wg.Add(workers)
-	for i := 0; i < workers; i++ {
+	e.wg.Add(config.MaxExecutorWorkers)
+	for i := 0; i < config.MaxExecutorWorkers; i++ {
 		go e.startWorker()
 	}
 
