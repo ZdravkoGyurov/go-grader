@@ -2,9 +2,8 @@ package db_test
 
 import (
 	"testing"
-	"time"
 
-	"grader/app/config"
+	"grader/app"
 	"grader/db"
 
 	. "github.com/onsi/ginkgo"
@@ -18,18 +17,16 @@ func TestBooks(t *testing.T) {
 
 var _ = Describe("DB", func() {
 	var (
-		cfg config.Config
+		appCtx app.Context
 	)
 
 	BeforeSuite(func() {
-		cfg = config.Config{
-			DBConnectTimeout: 30 * time.Second,
-		}
+		appCtx = app.NewContext()
 	})
 
 	Describe("Connecting to mongo DB", func() {
 		It("Should connect and ping successfully", func() {
-			_, err := db.Connect(cfg)
+			_, err := db.Connect(appCtx)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
