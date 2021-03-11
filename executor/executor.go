@@ -22,21 +22,27 @@ type Executor struct {
 	wg      sync.WaitGroup
 	jobs    chan job
 	stopped bool
+	cfg     config.Config
 }
 
 // New creates an executor with workers
-func New(config config.Config) (*Executor, StopFunc) {
+func New(cfg config.Config) *Executor {
 	e := &Executor{
 		wg:      sync.WaitGroup{},
-		jobs:    make(chan job, config.MaxExecutorConcurrentJobs),
+		jobs:    make(chan job, cfg.MaxExecutorConcurrentJobs),
 		stopped: false,
-	}
-	e.wg.Add(config.MaxExecutorWorkers)
-	for i := 0; i < config.MaxExecutorWorkers; i++ {
-		go e.startWorker()
+		cfg:     cfg,
 	}
 
-	return e, e.stop
+	return e
+}
+
+// Start ...
+func (e *Executor) Start() {
+	e.wg.Add(e.cfg.MaxExecutorWorkers)
+	for i := 0; i < e.cfg.MaxExecutorWorkers; i++ {
+		go e.startWorker()
+	}
 }
 
 // EnqueueJob ...
@@ -71,8 +77,11 @@ func (e *Executor) startWorker() {
 	}
 }
 
-func (e *Executor) stop() {
-	e.stopped = true
-	close(e.jobs)
-	e.wg.Wait()
+// Stop the executor, waits for all jobs to finish
+func (e *Executor) Stop() {
+	if e.stopped == false {
+		e.stopped = true
+		close(e.jobs)
+		e.wg.Wait()
+	}
 }

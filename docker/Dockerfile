@@ -3,6 +3,7 @@ FROM golang:alpine3.13
 ARG gitUser=ZdravkoGyurov
 ARG gitRepo=docker-tests
 ARG assignment=assignment1
+
 ENV ASSIGNMENT ${assignment}
 
 WORKDIR /app

@@ -16,70 +16,113 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// https://medium.com/honestbee-tw-engineer/gracefully-shutdown-in-go-http-server-5f5e6b83da5a
-// https://medium.com/@pinkudebnath/graceful-shutdown-of-golang-servers-using-context-and-os-signals-cc1fa2c55e97
+// Context ...
+type Context struct {
+	Context context.Context
+	Cancel  context.CancelFunc
+	Cfg     config.Config
+}
+
+// NewContext ...
+func NewContext() Context {
+	cfg := config.Config{
+		Host:                      "localhost",
+		Port:                      8080,
+		MaxExecutorWorkers:        5,
+		MaxExecutorConcurrentJobs: 100,
+		GithubTestsRepo:           "",
+		DBConnectTimeout:          30 * time.Second,
+		DBDisconnectTimeout:       30 * time.Second,
+		ServerShutdownTimeout:     5 * time.Second,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	return Context{
+		Context: ctx,
+		Cancel:  cancel,
+		Cfg:     cfg,
+	}
+}
 
 // Application ...
 type Application struct {
-	cfg          config.Config
-	stopExecutor executor.StopFunc
-	server       *http.Server
-	done         chan os.Signal
-	dbClient     *mongo.Client
+	appCtx   Context
+	exec     *executor.Executor
+	dbClient *mongo.Client
+	server   *http.Server
 }
 
 // New ...
-func New(cfg config.Config, stopExecutor executor.StopFunc, handler http.Handler, dbClient *mongo.Client) *Application {
-	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+func New(appCtx Context, exec *executor.Executor, dbClient *mongo.Client, handler http.Handler) *Application {
+	address := fmt.Sprintf("%s:%d", appCtx.Cfg.Host, appCtx.Cfg.Port)
 	server := &http.Server{
 		Addr:    address,
 		Handler: handler,
 	}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
 	return &Application{
-		cfg:          cfg,
-		stopExecutor: stopExecutor,
-		server:       server,
-		done:         done,
-		dbClient:     dbClient,
+		appCtx:   appCtx,
+		exec:     exec,
+		dbClient: dbClient,
+		server:   server,
 	}
 }
 
 // Start ...
-func (s *Application) Start() {
+func (a *Application) Start() {
+	a.setupSignalNotifier()
+
 	go func() {
-		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("failed listen and serve: %s\n", err)
 		}
 	}()
-	log.Println("application started...")
+	log.Println("Application started...")
 
-	<-s.done
+	<-a.appCtx.Context.Done()
 
-	defer func() {
-		s.stopExecutor()
-		log.Println("stopped job executor")
-
-		ctx, cancel := context.WithTimeout(context.Background(), s.cfg.DBDisconnectTimeout)
-		defer cancel()
-		if err := s.dbClient.Disconnect(ctx); err != nil {
-			log.Fatalf("failed to disconnect from mongodb: %s", err)
-		}
-		log.Println("disconnected from mongodb")
-	}()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := s.server.Shutdown(ctx); err != nil {
-		log.Fatalf("failed to shutdown http server: %s\n", err)
-	}
-	log.Println("application stopped")
+	a.stopExecutor()
+	a.disconnectFromDB()
+	a.shutdownServer()
+	log.Println("Application stopped gracefully")
 }
 
 // Stop ...
-func (s *Application) Stop() {
-	s.done <- os.Interrupt
+func (a *Application) Stop() {
+	a.appCtx.Cancel()
+}
+
+func (a *Application) setupSignalNotifier() {
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-signalChannel
+		log.Println("Stopping application...")
+		a.appCtx.Cancel()
+	}()
+}
+
+func (a *Application) stopExecutor() {
+	a.exec.Stop()
+	log.Println("Executor stopped")
+}
+
+func (a *Application) disconnectFromDB() {
+	dbDisconnectCtx, cancel := context.WithTimeout(context.Background(), a.appCtx.Cfg.DBDisconnectTimeout)
+	defer cancel()
+	err := a.dbClient.Disconnect(dbDisconnectCtx)
+	if err != nil {
+		log.Printf("failed to disconnect from db: %s\n", err)
+	}
+	log.Println("Disconnected from DB")
+}
+
+func (a *Application) shutdownServer() {
+	ctx, cancel := context.WithTimeout(context.Background(), a.appCtx.Cfg.ServerShutdownTimeout)
+	defer cancel()
+	if err := a.server.Shutdown(ctx); err != nil {
+		log.Fatalf("failed to shutdown http server: %s\n", err)
+	}
+	log.Println("Server shutdown")
 }

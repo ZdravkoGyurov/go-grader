@@ -7,30 +7,26 @@ import (
 	"grader/api"
 	"grader/api/router"
 	"grader/app"
-	"grader/app/config"
 	"grader/db"
 	"grader/executor"
 )
 
 func main() {
-	cfg := config.Config{
-		Host:                      "localhost",
-		Port:                      8080,
-		MaxExecutorWorkers:        5,
-		MaxExecutorConcurrentJobs: 100,
-		GithubTestsRepo:           "",
-		DBConnectTimeout:          30 * time.Second,
-	}
+	appCtx := app.NewContext()
 	// create db connection
-	dbClient, err := db.Connect(cfg)
+	dbClient, err := db.Connect(appCtx)
 	if err != nil {
 		log.Fatalf("failed to connect to mongodb: %s", err)
 	}
 	log.Println("connected to mongodb...")
 
 	// create executor
-	exec, stopExecutor := executor.New(cfg)
-	log.Println("started job executor...")
+	exec := executor.New(appCtx.Cfg)
+	exec.Start()
+	exec.EnqueueJob("wait", func() {
+		time.Sleep(10 * time.Second)
+	})
+	log.Println("Started job executor...")
 
 	// create db handlers
 	assignmentsDBHandler := db.NewAssignmentsHandler(dbClient)
@@ -42,7 +38,7 @@ func main() {
 	// create http router
 	httpRouter := router.New(assignmentsHTTPHandler, testRunHTTPHandler)
 
-	app := app.New(cfg, stopExecutor, httpRouter, dbClient)
+	app := app.New(appCtx, exec, dbClient, httpRouter)
 
 	app.Start()
 }
