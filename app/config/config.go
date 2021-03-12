@@ -10,6 +10,7 @@ type Config struct {
 	MaxExecutorConcurrentJobs int
 	DBConnectTimeout          time.Duration
 	DBDisconnectTimeout       time.Duration
+	DatabaseName              string
 	ServerShutdownTimeout     time.Duration
 	GithubTestsRepo           string
 }

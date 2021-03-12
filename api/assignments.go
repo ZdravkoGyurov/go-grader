@@ -8,6 +8,7 @@ import (
 	"grader/log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -41,7 +42,7 @@ func (h *AssignmentsHandler) Post(writer http.ResponseWriter, request *http.Requ
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	assignment.ID = "" // force mongo to generate ID
+	assignment.ID = uuid.NewString()
 
 	if err := h.dbHandler.CreateAssignment(ctx, &assignment); err != nil {
 		log.Info().Println(err)

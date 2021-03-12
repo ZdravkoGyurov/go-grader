@@ -33,6 +33,7 @@ func NewContext() Context {
 		GithubTestsRepo:           "",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
+		DatabaseName:              "grader",
 		ServerShutdownTimeout:     5 * time.Second,
 	}
 

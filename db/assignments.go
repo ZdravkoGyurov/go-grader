@@ -3,10 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
+	"grader/app"
 	"grader/db/models"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,32 +17,27 @@ type AssignmentsHandler struct {
 }
 
 // NewAssignmentsHandler creates a new assignments DB handler
-func NewAssignmentsHandler(client *mongo.Client) *AssignmentsHandler {
+func NewAssignmentsHandler(appCtx app.Context, client *mongo.Client) *AssignmentsHandler {
 	return &AssignmentsHandler{
-		collection: client.Database("grader").Collection(models.AssignmentsCollectionName),
+		collection: client.Database(appCtx.Cfg.DatabaseName).
+			Collection(models.AssignmentsCollectionName),
 	}
 }
 
 // CreateAssignment creates new assignment in the database
 func (h *AssignmentsHandler) CreateAssignment(ctx context.Context, assignment *models.Assignment) error {
-	result, err := h.collection.InsertOne(ctx, assignment)
+	_, err := h.collection.InsertOne(ctx, assignment)
 	if err != nil {
 		return fmt.Errorf("failed to insert assignment: %w", err)
 	}
-
-	assignment.ID = result.InsertedID.(primitive.ObjectID).Hex()
 
 	return nil
 }
 
 // ReadAssignment ...
 func (h *AssignmentsHandler) ReadAssignment(ctx context.Context, assignmentID string) (*models.Assignment, error) {
-	filter, err := filterByID(assignmentID)
-	if err != nil {
-		return nil, err
-	}
 	var assignment models.Assignment
-	if err := h.collection.FindOne(ctx, filter).Decode(&assignment); err != nil {
+	if err := h.collection.FindOne(ctx, filterByID(assignmentID)).Decode(&assignment); err != nil {
 		return nil, fmt.Errorf("failed to find assignment with id %s: %w", assignmentID, err)
 	}
 
@@ -51,16 +46,12 @@ func (h *AssignmentsHandler) ReadAssignment(ctx context.Context, assignmentID st
 
 // UpdateAssignment ...
 func (h *AssignmentsHandler) UpdateAssignment(ctx context.Context, assignmentID string, assignment *models.Assignment) (*models.Assignment, error) {
-	filter, err := filterByID(assignmentID)
-	if err != nil {
-		return nil, err
-	}
 	returnDocumentOption := options.After
 	options := &options.FindOneAndUpdateOptions{
 		ReturnDocument: &returnDocumentOption,
 	}
 	var updatedAssignment models.Assignment
-	err = h.collection.FindOneAndUpdate(ctx, filter, update(assignment), options).Decode(&updatedAssignment)
+	err := h.collection.FindOneAndUpdate(ctx, filterByID(assignmentID), update(assignment), options).Decode(&updatedAssignment)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find and update assignment with id %s: %w", assignmentID, err)
 	}
@@ -70,24 +61,15 @@ func (h *AssignmentsHandler) UpdateAssignment(ctx context.Context, assignmentID 
 
 // DeleteAssignment ...
 func (h *AssignmentsHandler) DeleteAssignment(ctx context.Context, assignmentID string) error {
-	filter, err := filterByID(assignmentID)
-	if err != nil {
-		return err
-	}
-	if _, err := h.collection.DeleteOne(ctx, filter); err != nil {
+	if _, err := h.collection.DeleteOne(ctx, filterByID(assignmentID)); err != nil {
 		return fmt.Errorf("failed to delete assignment with id %s: %w", assignmentID, err)
 	}
 
 	return nil
 }
 
-func filterByID(assignmentID string) (bson.M, error) {
-	objectID, err := primitive.ObjectIDFromHex(assignmentID)
-	if err != nil {
-		return bson.M{}, fmt.Errorf("failed to generate filter for id %s: %w", assignmentID, err)
-	}
-
-	return bson.M{"_id": objectID}, nil
+func filterByID(id string) bson.M {
+	return bson.M{"_id": id}
 }
 
 func update(assignment *models.Assignment) bson.M {
