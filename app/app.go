@@ -35,6 +35,7 @@ func NewContext() Context {
 		DBDisconnectTimeout:       30 * time.Second,
 		DatabaseName:              "grader",
 		ServerShutdownTimeout:     5 * time.Second,
+		SessionCookieName:         "Grader",
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

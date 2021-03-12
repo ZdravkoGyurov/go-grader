@@ -30,8 +30,8 @@ func main() {
 
 	// create http handlers
 	registrationHTTPHandler := api.NewRegistrationHandler(userDBHandler)
-	loginHTTPHandler := api.NewLoginHandler(userDBHandler, sessionDBHandler)
-	logoutHTTPHandler := api.NewLogoutHandler(sessionDBHandler)
+	loginHTTPHandler := api.NewLoginHandler(appCtx, userDBHandler, sessionDBHandler)
+	logoutHTTPHandler := api.NewLogoutHandler(appCtx, sessionDBHandler)
 	assignmentsHTTPHandler := api.NewAssignmentsHandler(assignmentsDBHandler)
 	testRunHTTPHandler := api.NewTestRunHandler(exec)
 

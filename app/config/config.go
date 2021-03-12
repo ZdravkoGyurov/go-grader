@@ -13,4 +13,5 @@ type Config struct {
 	DatabaseName              string
 	ServerShutdownTimeout     time.Duration
 	GithubTestsRepo           string
+	SessionCookieName         string
 }

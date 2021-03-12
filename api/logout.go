@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"grader/app"
 	"grader/log"
 	"net/http"
 	"time"
@@ -13,12 +14,14 @@ type sessionHandler interface {
 
 // LogoutHandler ...
 type LogoutHandler struct {
+	appCtx app.Context
 	sessionHandler
 }
 
 // NewLogoutHandler creates a new logout http handler
-func NewLogoutHandler(sessionHandler sessionHandler) *LogoutHandler {
+func NewLogoutHandler(appCtx app.Context, sessionHandler sessionHandler) *LogoutHandler {
 	return &LogoutHandler{
+		appCtx:         appCtx,
 		sessionHandler: sessionHandler,
 	}
 }
@@ -42,7 +45,7 @@ func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) 
 	}
 
 	expiredCookie := http.Cookie{
-		Name:    "Grader",
+		Name:    h.appCtx.Cfg.SessionCookieName,
 		Expires: time.Now().Add(-time.Hour),
 	}
 	http.SetCookie(writer, &expiredCookie)

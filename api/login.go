@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"grader/app"
 	"grader/db/models"
 	"grader/log"
 	"grader/random"
@@ -21,13 +22,15 @@ type sessionDBHandler interface {
 
 // LoginHandler ...
 type LoginHandler struct {
+	appCtx app.Context
 	userHandler
 	sessionDBHandler
 }
 
 // NewLoginHandler creates a new login http handler
-func NewLoginHandler(userHandler userHandler, sessionHandler sessionDBHandler) *LoginHandler {
+func NewLoginHandler(appCtx app.Context, userHandler userHandler, sessionHandler sessionDBHandler) *LoginHandler {
 	return &LoginHandler{
+		appCtx:           appCtx,
 		userHandler:      userHandler,
 		sessionDBHandler: sessionHandler,
 	}
@@ -70,9 +73,9 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 
 	// TODO: make secure cookie
 	cookie := http.Cookie{
-		Name:     "Grader",
+		Name:     h.appCtx.Cfg.SessionCookieName,
 		Value:    session.ID,
-		Domain:   "localhost",
+		Domain:   h.appCtx.Cfg.Host,
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour),
 		HttpOnly: true,
