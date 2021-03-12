@@ -2,7 +2,7 @@ package docker
 
 import (
 	"fmt"
-	"log"
+	"grader/log"
 )
 
 // ExecuteTests ...
@@ -24,12 +24,12 @@ func ExecuteTests(imageName, containerName string) (string, error) {
 
 func handleRemoveImage(imageName string) {
 	if err := RemoveImage(imageName); err != nil {
-		log.Printf("failed docker image rm: %s", err)
+		log.Info().Printf("failed docker image rm: %s", err)
 	}
 }
 
 func handleRemoveContainer(containerName string) {
 	if err := RemoveContainer(containerName); err != nil {
-		log.Printf("failed docker rm: %s", err)
+		log.Info().Printf("failed docker rm: %s", err)
 	}
 }

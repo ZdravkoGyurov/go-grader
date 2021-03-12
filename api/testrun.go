@@ -2,10 +2,10 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"grader/docker"
+	"grader/log"
 	"grader/random"
 )
 
@@ -38,14 +38,14 @@ func (h *TestRunHandler) Post(writer http.ResponseWriter, request *http.Request)
 		containerName := random.String()
 		output, err := docker.ExecuteTests(imageName, containerName)
 		if err != nil {
-			log.Println(err) // log status in db
+			log.Info().Println(err) // log status in db
 			return
 		}
-		log.Println(">>>", output) // log status in db
+		log.Info().Println(">>>", output) // log status in db
 	}
 	jobID, err := h.executor.EnqueueJob(jobName, jobFunc)
 	if err != nil {
-		log.Printf("failed to run job '%s': %s", jobName, err)
+		log.Info().Printf("failed to run job '%s': %s", jobName, err)
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}

@@ -1,14 +1,12 @@
 package main
 
 import (
-	"log"
-	"time"
-
 	"grader/api"
 	"grader/api/router"
 	"grader/app"
 	"grader/db"
 	"grader/executor"
+	"grader/log"
 )
 
 func main() {
@@ -16,17 +14,17 @@ func main() {
 	// create db connection
 	dbClient, err := db.Connect(appCtx)
 	if err != nil {
-		log.Fatalf("failed to connect to mongodb: %s", err)
+		log.Error().Fatalf("failed to connect to mongodb: %s", err)
 	}
-	log.Println("connected to mongodb...")
+	log.Info().Println("connected to mongodb...")
+	log.Debug().Println("connected to mongodb...")
+	log.Error().Println("connected to mongodb...")
+	log.Warning().Println("connected to mongodb...")
 
 	// create executor
 	exec := executor.New(appCtx.Cfg)
 	exec.Start()
-	exec.EnqueueJob("wait", func() {
-		time.Sleep(10 * time.Second)
-	})
-	log.Println("Started job executor...")
+	log.Info().Println("Started job executor...")
 
 	// create db handlers
 	assignmentsDBHandler := db.NewAssignmentsHandler(dbClient)
