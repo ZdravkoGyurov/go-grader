@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +11,7 @@ import (
 
 	"grader/app/config"
 	"grader/executor"
+	"grader/log"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -75,17 +75,17 @@ func (a *Application) Start() {
 
 	go func() {
 		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("failed listen and serve: %s\n", err)
+			log.Error().Fatalf("failed listen and serve: %s\n", err)
 		}
 	}()
-	log.Println("Application started...")
+	log.Info().Println("Application started...")
 
 	<-a.appCtx.Context.Done()
 
 	a.stopExecutor()
 	a.disconnectFromDB()
 	a.shutdownServer()
-	log.Println("Application stopped gracefully")
+	log.Info().Println("Application stopped gracefully")
 }
 
 // Stop ...
@@ -98,14 +98,14 @@ func (a *Application) setupSignalNotifier() {
 	signal.Notify(signalChannel, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-signalChannel
-		log.Println("Stopping application...")
+		log.Info().Println("Stopping application...")
 		a.appCtx.Cancel()
 	}()
 }
 
 func (a *Application) stopExecutor() {
 	a.exec.Stop()
-	log.Println("Executor stopped")
+	log.Info().Println("Executor stopped")
 }
 
 func (a *Application) disconnectFromDB() {
@@ -113,16 +113,16 @@ func (a *Application) disconnectFromDB() {
 	defer cancel()
 	err := a.dbClient.Disconnect(dbDisconnectCtx)
 	if err != nil {
-		log.Printf("failed to disconnect from db: %s\n", err)
+		log.Info().Printf("failed to disconnect from db: %s\n", err)
 	}
-	log.Println("Disconnected from DB")
+	log.Info().Println("Disconnected from DB")
 }
 
 func (a *Application) shutdownServer() {
 	ctx, cancel := context.WithTimeout(context.Background(), a.appCtx.Cfg.ServerShutdownTimeout)
 	defer cancel()
 	if err := a.server.Shutdown(ctx); err != nil {
-		log.Fatalf("failed to shutdown http server: %s\n", err)
+		log.Error().Fatalf("failed to shutdown http server: %s\n", err)
 	}
-	log.Println("Server shutdown")
+	log.Info().Println("Server shutdown")
 }
