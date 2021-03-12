@@ -75,7 +75,7 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		Domain:   "localhost",
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour),
-		HttpOnly: false,
+		HttpOnly: true,
 		Secure:   false,
 		SameSite: http.SameSiteDefaultMode,
 	}

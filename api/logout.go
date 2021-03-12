@@ -43,7 +43,7 @@ func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) 
 
 	expiredCookie := http.Cookie{
 		Name:    "Grader",
-		Expires: time.Now().Add(-time.Second),
+		Expires: time.Now().Add(-time.Hour),
 	}
 	http.SetCookie(writer, &expiredCookie)
 
