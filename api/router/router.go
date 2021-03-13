@@ -9,28 +9,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type HTTPHandlers struct {
-	Registration *api.RegistrationHandler
-	Login        *api.LoginHandler
-	Logout       *api.LogoutHandler
-	Assignments  *api.AssignmentsHandler
-	TestRun      *api.TestRunHandler
-}
-
 // New creates a mux router with configured routes
-func New(httpHandlers HTTPHandlers) *mux.Router {
+func New(httpHandler *api.Handler) *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc(paths.Register, httpHandlers.Registration.Post).Methods(http.MethodPost)
-	r.HandleFunc(paths.Login, httpHandlers.Login.Post).Methods(http.MethodPost)
-	r.HandleFunc(paths.Logout, httpHandlers.Logout.Post).Methods(http.MethodPost)
+	r.HandleFunc(paths.Register, httpHandler.Registration.Post).Methods(http.MethodPost)
+	r.HandleFunc(paths.Login, httpHandler.Login.Post).Methods(http.MethodPost)
+	r.HandleFunc(paths.Logout, httpHandler.Logout.Post).Methods(http.MethodPost)
 
-	r.HandleFunc(paths.Assignments, httpHandlers.Assignments.Post).Methods(http.MethodPost)
-	r.HandleFunc(paths.AssignmentsWithID, httpHandlers.Assignments.Get).Methods(http.MethodGet)
-	r.HandleFunc(paths.AssignmentsWithID, httpHandlers.Assignments.Patch).Methods(http.MethodPatch)
-	r.HandleFunc(paths.AssignmentsWithID, httpHandlers.Assignments.Delete).Methods(http.MethodDelete)
+	r.HandleFunc(paths.Assignments, httpHandler.Assignment.Post).Methods(http.MethodPost)
+	r.HandleFunc(paths.AssignmentsWithID, httpHandler.Assignment.Get).Methods(http.MethodGet)
+	r.HandleFunc(paths.AssignmentsWithID, httpHandler.Assignment.Patch).Methods(http.MethodPatch)
+	r.HandleFunc(paths.AssignmentsWithID, httpHandler.Assignment.Delete).Methods(http.MethodDelete)
 
-	r.HandleFunc(paths.TestRun, httpHandlers.TestRun.Post).Methods(http.MethodPost)
+	r.HandleFunc(paths.TestRun, httpHandler.TestRun.Post).Methods(http.MethodPost)
 
 	return r
 }

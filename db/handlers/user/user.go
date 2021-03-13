@@ -1,4 +1,4 @@
-package db
+package user
 
 import (
 	"context"
@@ -10,22 +10,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// UserHandler ...
-type UserHandler struct {
+// DBHandler ...
+type DBHandler struct {
 	appCtx     app.Context
 	collection *mongo.Collection
 }
 
-// NewUserHandler creates a new user DB handler
-func NewUserHandler(appCtx app.Context, client *mongo.Client) *UserHandler {
-	return &UserHandler{
+// NewHandler creates a new user DB handler
+func NewDBHandler(appCtx app.Context, client *mongo.Client) *DBHandler {
+	return &DBHandler{
 		collection: client.Database(appCtx.Cfg.DatabaseName).
 			Collection(models.UserCollectionName),
 	}
 }
 
-// CreateUser creates new user in the database
-func (h *UserHandler) CreateUser(ctx context.Context, user *models.User) error {
+// Create creates new user in the database
+func (h *DBHandler) Create(ctx context.Context, user *models.User) error {
 	_, err := h.collection.InsertOne(ctx, user)
 	if err != nil {
 		return fmt.Errorf("failed to insert user: %w", err)
@@ -34,8 +34,8 @@ func (h *UserHandler) CreateUser(ctx context.Context, user *models.User) error {
 	return nil
 }
 
-// ReadUser ...
-func (h *UserHandler) ReadUser(ctx context.Context, username string) (*models.User, error) {
+// Read ...
+func (h *DBHandler) Read(ctx context.Context, username string) (*models.User, error) {
 	var user models.User
 
 	result := h.collection.FindOne(ctx, filterByUsername(username))

@@ -1,4 +1,4 @@
-package api
+package logout
 
 import (
 	"context"
@@ -8,26 +8,26 @@ import (
 	"time"
 )
 
-type sessionHandler interface {
-	DeleteSession(ctx context.Context, sessionID string) error
+type sessionDBHandler interface {
+	Delete(ctx context.Context, sessionID string) error
 }
 
-// LogoutHandler ...
-type LogoutHandler struct {
+// HTTPHandler ...
+type HTTPHandler struct {
 	appCtx app.Context
-	sessionHandler
+	sessionDBHandler
 }
 
-// NewLogoutHandler creates a new logout http handler
-func NewLogoutHandler(appCtx app.Context, sessionHandler sessionHandler) *LogoutHandler {
-	return &LogoutHandler{
-		appCtx:         appCtx,
-		sessionHandler: sessionHandler,
+// NewHTTPHandler creates a new logout http handler
+func NewHTTPHandler(appCtx app.Context, sessionDBHandler sessionDBHandler) *HTTPHandler {
+	return &HTTPHandler{
+		appCtx:           appCtx,
+		sessionDBHandler: sessionDBHandler,
 	}
 }
 
 // Post ...
-func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	cookie, err := request.Cookie("Grader")
@@ -38,7 +38,7 @@ func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) 
 	}
 
 	sessionID := cookie.Value
-	if err := h.sessionHandler.DeleteSession(ctx, sessionID); err != nil {
+	if err := h.sessionDBHandler.Delete(ctx, sessionID); err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return

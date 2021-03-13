@@ -1,4 +1,4 @@
-package api
+package testrun
 
 import (
 	"fmt"
@@ -16,20 +16,20 @@ type executor interface {
 	EnqueueJob(name string, f func()) (id string, err error)
 }
 
-// TestRunHandler ...
-type TestRunHandler struct {
+// HTTPHandler ...
+type HTTPHandler struct {
 	executor
 }
 
-// NewTestRunHandler creates a new test run http handler
-func NewTestRunHandler(executor executor) *TestRunHandler {
-	return &TestRunHandler{
+// NewHTTPHandler creates a new test run http handler
+func NewHTTPHandler(executor executor) *HTTPHandler {
+	return &HTTPHandler{
 		executor: executor,
 	}
 }
 
 // Post ...
-func (h *TestRunHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	// ctx := request.Context()
 
 	jobName := "run tests in docker"

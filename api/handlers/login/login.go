@@ -1,4 +1,4 @@
-package api
+package login
 
 import (
 	"context"
@@ -12,32 +12,32 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type userHandler interface {
-	ReadUser(ctx context.Context, username string) (*models.User, error)
+type userDBHandler interface {
+	Read(ctx context.Context, username string) (*models.User, error)
 }
 
 type sessionDBHandler interface {
-	CreateSession(ctx context.Context, session *models.Session) error
+	Create(ctx context.Context, session *models.Session) error
 }
 
-// LoginHandler ...
-type LoginHandler struct {
+// HTTPHandler ...
+type HTTPHandler struct {
 	appCtx app.Context
-	userHandler
+	userDBHandler
 	sessionDBHandler
 }
 
-// NewLoginHandler creates a new login http handler
-func NewLoginHandler(appCtx app.Context, userHandler userHandler, sessionHandler sessionDBHandler) *LoginHandler {
-	return &LoginHandler{
+// NewHTTPHandler creates a new login http handler
+func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler, sessionHandler sessionDBHandler) *HTTPHandler {
+	return &HTTPHandler{
 		appCtx:           appCtx,
-		userHandler:      userHandler,
+		userDBHandler:    userDBHandler,
 		sessionDBHandler: sessionHandler,
 	}
 }
 
 // Post ...
-func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	username, password, ok := request.BasicAuth()
@@ -47,7 +47,7 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	user, err := h.userHandler.ReadUser(ctx, username)
+	user, err := h.userDBHandler.Read(ctx, username)
 	if err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -64,7 +64,7 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		ID:     random.LongString(),
 		UserID: user.ID,
 	}
-	err = h.sessionDBHandler.CreateSession(ctx, &session)
+	err = h.sessionDBHandler.Create(ctx, &session)
 	if err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)

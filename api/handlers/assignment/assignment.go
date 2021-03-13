@@ -1,4 +1,4 @@
-package api
+package assignment
 
 import (
 	"context"
@@ -12,27 +12,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type assignmentsDBHandler interface {
-	CreateAssignment(ctx context.Context, assignment *models.Assignment) error
-	ReadAssignment(ctx context.Context, assignmentID string) (*models.Assignment, error)
-	UpdateAssignment(ctx context.Context, assignmentID string, assignment *models.Assignment) (*models.Assignment, error)
-	DeleteAssignment(ctx context.Context, assignmentID string) error
+type assignmentDBHandler interface {
+	Create(ctx context.Context, assignment *models.Assignment) error
+	Read(ctx context.Context, assignmentID string) (*models.Assignment, error)
+	Update(ctx context.Context, assignmentID string, assignment *models.Assignment) (*models.Assignment, error)
+	Delete(ctx context.Context, assignmentID string) error
 }
 
-// AssignmentsHandler ...
-type AssignmentsHandler struct {
-	dbHandler assignmentsDBHandler
+// HTTPHandler ...
+type HTTPHandler struct {
+	assignmentDBHandler
 }
 
-// NewAssignmentsHandler creates a new assignments http handler
-func NewAssignmentsHandler(dbHandler assignmentsDBHandler) *AssignmentsHandler {
-	return &AssignmentsHandler{
-		dbHandler: dbHandler,
+// NewHTTPHandler creates a new assignments http handler
+func NewHTTPHandler(assignmentDBHandler assignmentDBHandler) *HTTPHandler {
+	return &HTTPHandler{
+		assignmentDBHandler: assignmentDBHandler,
 	}
 }
 
 // Post ...
-func (h *AssignmentsHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	var assignment models.Assignment
@@ -44,7 +44,7 @@ func (h *AssignmentsHandler) Post(writer http.ResponseWriter, request *http.Requ
 	}
 	assignment.ID = uuid.NewString()
 
-	if err := h.dbHandler.CreateAssignment(ctx, &assignment); err != nil {
+	if err := h.assignmentDBHandler.Create(ctx, &assignment); err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
@@ -56,7 +56,7 @@ func (h *AssignmentsHandler) Post(writer http.ResponseWriter, request *http.Requ
 }
 
 // Get ...
-func (h *AssignmentsHandler) Get(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Get(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentsIDParam]
@@ -66,7 +66,7 @@ func (h *AssignmentsHandler) Get(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	assignment, err := h.dbHandler.ReadAssignment(ctx, assignmentID)
+	assignment, err := h.assignmentDBHandler.Read(ctx, assignmentID)
 	if err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -86,7 +86,7 @@ func (h *AssignmentsHandler) Get(writer http.ResponseWriter, request *http.Reque
 }
 
 // Patch ...
-func (h *AssignmentsHandler) Patch(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentsIDParam]
@@ -105,7 +105,7 @@ func (h *AssignmentsHandler) Patch(writer http.ResponseWriter, request *http.Req
 	}
 	updateAssignment.ID = ""
 
-	updatedAssignment, err := h.dbHandler.UpdateAssignment(ctx, assignmentID, &updateAssignment)
+	updatedAssignment, err := h.assignmentDBHandler.Update(ctx, assignmentID, &updateAssignment)
 	if err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -126,7 +126,7 @@ func (h *AssignmentsHandler) Patch(writer http.ResponseWriter, request *http.Req
 }
 
 // Delete ...
-func (h *AssignmentsHandler) Delete(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Delete(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentsIDParam]
@@ -136,7 +136,7 @@ func (h *AssignmentsHandler) Delete(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	if err := h.dbHandler.DeleteAssignment(ctx, assignmentID); err != nil {
+	if err := h.assignmentDBHandler.Delete(ctx, assignmentID); err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return

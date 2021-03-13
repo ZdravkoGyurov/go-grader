@@ -1,4 +1,4 @@
-package api
+package registration
 
 import (
 	"context"
@@ -11,23 +11,23 @@ import (
 )
 
 type userDBHandler interface {
-	CreateUser(ctx context.Context, user *models.User) error
+	Create(ctx context.Context, user *models.User) error
 }
 
-// RegistrationHandler ...
-type RegistrationHandler struct {
-	dbHandler userDBHandler
+// HTTPHandler ...
+type HTTPHandler struct {
+	userDBHandler
 }
 
-// NewRegistrationHandler creates a new registration http handler
-func NewRegistrationHandler(dbHandler userDBHandler) *RegistrationHandler {
-	return &RegistrationHandler{
-		dbHandler: dbHandler,
+// NewHTTPHandler creates a new registration http handler
+func NewHTTPHandler(userDBHandler userDBHandler) *HTTPHandler {
+	return &HTTPHandler{
+		userDBHandler: userDBHandler,
 	}
 }
 
 // Post ...
-func (h *RegistrationHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	username, password, ok := request.BasicAuth()
@@ -53,7 +53,7 @@ func (h *RegistrationHandler) Post(writer http.ResponseWriter, request *http.Req
 		Disabled: false,
 	}
 
-	if err := h.dbHandler.CreateUser(ctx, &user); err != nil {
+	if err := h.userDBHandler.Create(ctx, &user); err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
