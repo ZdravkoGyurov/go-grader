@@ -1,10 +1,10 @@
 package api
 
 import (
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/account/login"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/account/logout"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/account/registration"
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/assignment"
-	"github.com/ZdravkoGyurov/go-grader/api/handlers/login"
-	"github.com/ZdravkoGyurov/go-grader/api/handlers/logout"
-	"github.com/ZdravkoGyurov/go-grader/api/handlers/registration"
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/testrun"
 	"github.com/ZdravkoGyurov/go-grader/app"
 	"github.com/ZdravkoGyurov/go-grader/db"

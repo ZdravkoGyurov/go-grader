@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
 	"github.com/ZdravkoGyurov/go-grader/app"
 	"github.com/ZdravkoGyurov/go-grader/db/models"
 	"github.com/ZdravkoGyurov/go-grader/log"
@@ -35,10 +36,9 @@ func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler) *HTTPHandle
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	_, err := request.Cookie(h.appCtx.Cfg.SessionCookieName)
-	if err == nil {
+	if account.UserLoggedIn(h.appCtx, request) {
 		log.Error().Println(errors.New("failed to register logged in user"))
-		writer.WriteHeader(http.StatusConflict)
+		writer.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 

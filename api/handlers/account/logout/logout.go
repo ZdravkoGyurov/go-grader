@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
 	"github.com/ZdravkoGyurov/go-grader/app"
 	"github.com/ZdravkoGyurov/go-grader/log"
 )
@@ -32,8 +33,7 @@ func NewHTTPHandler(appCtx app.Context, sessionDBHandler sessionDBHandler) *HTTP
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	_, err := request.Cookie(h.appCtx.Cfg.SessionCookieName)
-	if err != nil {
+	if !account.UserLoggedIn(h.appCtx, request) {
 		log.Warning().Println(errors.New("failed to logout logged out user"))
 		writer.WriteHeader(http.StatusOK)
 		return
