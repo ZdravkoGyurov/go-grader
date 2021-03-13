@@ -11,7 +11,7 @@ import (
 	"grader/executor"
 )
 
-type Handler struct {
+type Handlers struct {
 	Assignment   *assignment.HTTPHandler
 	Login        *login.HTTPHandler
 	Logout       *logout.HTTPHandler
@@ -19,8 +19,8 @@ type Handler struct {
 	TestRun      *testrun.HTTPHandler
 }
 
-func NewHandler(appCtx app.Context, dbHandler db.Handler, exec *executor.Executor) *Handler {
-	return &Handler{
+func NewHandlers(appCtx app.Context, dbHandler db.Handlers, exec *executor.Executor) *Handlers {
+	return &Handlers{
 		Assignment:   assignment.NewHTTPHandler(dbHandler.Assignment),
 		Login:        login.NewHTTPHandler(appCtx, dbHandler.User, dbHandler.Session),
 		Logout:       logout.NewHTTPHandler(appCtx, dbHandler.Session),

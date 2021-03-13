@@ -9,14 +9,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Handler struct {
+type Handlers struct {
 	Assignment *assignment.DBHandler
 	Session    *session.DBHandler
 	User       *user.DBHandler
 }
 
-func NewHandler(appCtx app.Context, client *mongo.Client) *Handler {
-	return &Handler{
+func NewHandlers(appCtx app.Context, client *mongo.Client) *Handlers {
+	return &Handlers{
 		Assignment: assignment.NewDBHandler(appCtx, client),
 		Session:    session.NewDBHandler(appCtx, client),
 		User:       user.NewDBHandler(appCtx, client),

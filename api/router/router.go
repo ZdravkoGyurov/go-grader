@@ -10,7 +10,7 @@ import (
 )
 
 // New creates a mux router with configured routes
-func New(httpHandler *api.Handler) *mux.Router {
+func New(httpHandler *api.Handlers) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc(paths.Register, httpHandler.Registration.Post).Methods(http.MethodPost)

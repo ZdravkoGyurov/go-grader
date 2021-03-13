@@ -22,8 +22,8 @@ func main() {
 	exec.Start()
 	log.Info().Println("Started job executor...")
 
-	dbHandler := db.NewHandler(appCtx, dbClient)
-	httpHandler := api.NewHandler(appCtx, *dbHandler, exec)
+	dbHandler := db.NewHandlers(appCtx, dbClient)
+	httpHandler := api.NewHandlers(appCtx, *dbHandler, exec)
 	httpRouter := router.New(httpHandler)
 
 	app := app.New(appCtx, exec, dbClient, httpRouter)

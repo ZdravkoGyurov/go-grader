@@ -31,6 +31,7 @@ func NewContext() Context {
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
 		GithubTestsRepo:           "",
+		DatabaseURI:               "mongodb://localhost:27017",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
 		DatabaseName:              "grader",

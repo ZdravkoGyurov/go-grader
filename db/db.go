@@ -11,7 +11,7 @@ import (
 
 // Connect ...
 func Connect(appCtx app.Context) (*mongo.Client, error) {
-	options := options.Client().ApplyURI("mongodb://localhost:27017")
+	options := options.Client().ApplyURI(appCtx.Cfg.DatabaseURI)
 
 	ctx, cancel := context.WithTimeout(appCtx.Context, appCtx.Cfg.DBConnectTimeout)
 	defer cancel()
