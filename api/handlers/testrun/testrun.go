@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"grader/docker"
-	"grader/log"
-	"grader/random"
+	"github.com/ZdravkoGyurov/go-grader/docker"
+	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/random"
 )
 
 type testRunDBHandler interface {

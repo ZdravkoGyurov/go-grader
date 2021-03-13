@@ -2,10 +2,11 @@ package logout
 
 import (
 	"context"
-	"grader/app"
-	"grader/log"
 	"net/http"
 	"time"
+
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 type sessionDBHandler interface {

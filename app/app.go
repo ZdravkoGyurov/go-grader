@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"grader/app/config"
-	"grader/executor"
-	"grader/log"
-
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/ZdravkoGyurov/go-grader/app/config"
+	"github.com/ZdravkoGyurov/go-grader/executor"
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 // Context ...

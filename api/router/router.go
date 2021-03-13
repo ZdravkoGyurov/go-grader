@@ -3,10 +3,10 @@ package router
 import (
 	"net/http"
 
-	"grader/api"
-	"grader/api/router/paths"
-
 	"github.com/gorilla/mux"
+
+	"github.com/ZdravkoGyurov/go-grader/api"
+	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
 )
 
 // New creates a mux router with configured routes

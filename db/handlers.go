@@ -1,12 +1,12 @@
 package db
 
 import (
-	"grader/app"
-	"grader/db/handlers/assignment"
-	"grader/db/handlers/session"
-	"grader/db/handlers/user"
-
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/db/handlers/assignment"
+	"github.com/ZdravkoGyurov/go-grader/db/handlers/session"
+	"github.com/ZdravkoGyurov/go-grader/db/handlers/user"
 )
 
 type Handlers struct {

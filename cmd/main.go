@@ -1,12 +1,12 @@
 package main
 
 import (
-	"grader/api"
-	"grader/api/router"
-	"grader/app"
-	"grader/db"
-	"grader/executor"
-	"grader/log"
+	"github.com/ZdravkoGyurov/go-grader/api"
+	"github.com/ZdravkoGyurov/go-grader/api/router"
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/db"
+	"github.com/ZdravkoGyurov/go-grader/executor"
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 func main() {

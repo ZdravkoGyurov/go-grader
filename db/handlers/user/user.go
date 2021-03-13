@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	"fmt"
-	"grader/app"
-	"grader/db/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/db/models"
 )
 
 // DBHandler ...

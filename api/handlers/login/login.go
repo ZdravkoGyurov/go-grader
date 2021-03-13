@@ -2,14 +2,15 @@ package login
 
 import (
 	"context"
-	"grader/app"
-	"grader/db/models"
-	"grader/log"
-	"grader/random"
 	"net/http"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/db/models"
+	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/random"
 )
 
 type userDBHandler interface {

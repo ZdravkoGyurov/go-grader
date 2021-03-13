@@ -1,4 +1,4 @@
-module grader
+module github.com/ZdravkoGyurov/go-grader
 
 require (
 	github.com/google/uuid v1.2.0

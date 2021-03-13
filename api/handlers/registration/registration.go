@@ -2,12 +2,13 @@ package registration
 
 import (
 	"context"
-	"grader/db/models"
-	"grader/log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/ZdravkoGyurov/go-grader/db/models"
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 type userDBHandler interface {

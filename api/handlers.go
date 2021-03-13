@@ -1,14 +1,14 @@
 package api
 
 import (
-	"grader/api/handlers/assignment"
-	"grader/api/handlers/login"
-	"grader/api/handlers/logout"
-	"grader/api/handlers/registration"
-	"grader/api/handlers/testrun"
-	"grader/app"
-	"grader/db"
-	"grader/executor"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/assignment"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/login"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/logout"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/registration"
+	"github.com/ZdravkoGyurov/go-grader/api/handlers/testrun"
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/db"
+	"github.com/ZdravkoGyurov/go-grader/executor"
 )
 
 type Handlers struct {

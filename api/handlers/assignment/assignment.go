@@ -3,13 +3,14 @@ package assignment
 import (
 	"context"
 	"encoding/json"
-	"grader/api/router/paths"
-	"grader/db/models"
-	"grader/log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+
+	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
+	"github.com/ZdravkoGyurov/go-grader/db/models"
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 type assignmentDBHandler interface {
