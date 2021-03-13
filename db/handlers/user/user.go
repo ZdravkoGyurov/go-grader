@@ -36,7 +36,19 @@ func (h *DBHandler) Create(ctx context.Context, user *models.User) error {
 }
 
 // Read ...
-func (h *DBHandler) Read(ctx context.Context, username string) (*models.User, error) {
+func (h *DBHandler) ReadByID(ctx context.Context, userID string) (*models.User, error) {
+	var user models.User
+
+	result := h.collection.FindOne(ctx, bson.M{"_id": userID})
+	if err := result.Decode(&user); err != nil {
+		return nil, fmt.Errorf("failed to find user with id %s: %w", userID, err)
+	}
+
+	return &user, nil
+}
+
+// Read ...
+func (h *DBHandler) ReadByUsername(ctx context.Context, username string) (*models.User, error) {
 	var user models.User
 
 	result := h.collection.FindOne(ctx, filterByUsername(username))

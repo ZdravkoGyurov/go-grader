@@ -24,7 +24,7 @@ func main() {
 
 	dbHandler := db.NewHandlers(appCtx, dbClient)
 	httpHandler := api.NewHandlers(appCtx, *dbHandler, exec)
-	httpRouter := router.New(httpHandler)
+	httpRouter := router.New(appCtx, dbHandler, httpHandler)
 
 	app := app.New(appCtx, exec, dbClient, httpRouter)
 

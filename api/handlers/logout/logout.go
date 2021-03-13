@@ -2,6 +2,7 @@ package logout
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -30,6 +31,13 @@ func NewHTTPHandler(appCtx app.Context, sessionDBHandler sessionDBHandler) *HTTP
 // Post ...
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
+
+	_, err := request.Cookie(h.appCtx.Cfg.SessionCookieName)
+	if err != nil {
+		log.Warning().Println(errors.New("failed to logout logged out user"))
+		writer.WriteHeader(http.StatusOK)
+		return
+	}
 
 	cookie, err := request.Cookie("Grader")
 	if err != nil {

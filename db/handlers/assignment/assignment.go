@@ -17,11 +17,11 @@ type DBHandler struct {
 	collection *mongo.Collection
 }
 
-// NewDBHandler creates a new assignments DB handler
+// NewDBHandler creates a new assignment DB handler
 func NewDBHandler(appCtx app.Context, client *mongo.Client) *DBHandler {
 	return &DBHandler{
 		collection: client.Database(appCtx.Cfg.DatabaseName).
-			Collection(models.AssignmentsCollectionName),
+			Collection(models.AssignmentCollectionName),
 	}
 }
 

@@ -2,11 +2,13 @@ package registration
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/ZdravkoGyurov/go-grader/app"
 	"github.com/ZdravkoGyurov/go-grader/db/models"
 	"github.com/ZdravkoGyurov/go-grader/log"
 )
@@ -17,12 +19,14 @@ type userDBHandler interface {
 
 // HTTPHandler ...
 type HTTPHandler struct {
+	appCtx app.Context
 	userDBHandler
 }
 
 // NewHTTPHandler creates a new registration http handler
-func NewHTTPHandler(userDBHandler userDBHandler) *HTTPHandler {
+func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler) *HTTPHandler {
 	return &HTTPHandler{
+		appCtx:        appCtx,
 		userDBHandler: userDBHandler,
 	}
 }
@@ -30,6 +34,13 @@ func NewHTTPHandler(userDBHandler userDBHandler) *HTTPHandler {
 // Post ...
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
+
+	_, err := request.Cookie(h.appCtx.Cfg.SessionCookieName)
+	if err == nil {
+		log.Error().Println(errors.New("failed to register logged in user"))
+		writer.WriteHeader(http.StatusConflict)
+		return
+	}
 
 	username, password, ok := request.BasicAuth()
 	if !ok {

@@ -5,9 +5,9 @@ const (
 	Login    = "/login"
 	Logout   = "/logout"
 
-	AssignmentsIDParam = "id"
-	Assignments        = "/assignments"
-	AssignmentsWithID  = "/assignments/{" + AssignmentsIDParam + "}"
+	AssignmentIDParam = "id"
+	Assignment        = "/assignment"
+	AssignmentWithID  = "/assignment/{" + AssignmentIDParam + "}"
 
 	TestRun = "/testrun"
 )

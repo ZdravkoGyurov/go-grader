@@ -25,7 +25,7 @@ type HTTPHandler struct {
 	assignmentDBHandler
 }
 
-// NewHTTPHandler creates a new assignments http handler
+// NewHTTPHandler creates a new assignment http handler
 func NewHTTPHandler(assignmentDBHandler assignmentDBHandler) *HTTPHandler {
 	return &HTTPHandler{
 		assignmentDBHandler: assignmentDBHandler,
@@ -60,7 +60,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 func (h *HTTPHandler) Get(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	assignmentID, ok := mux.Vars(request)[paths.AssignmentsIDParam]
+	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
 	if !ok {
 		log.Info().Println("failed to get assignment id path parameter")
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -90,7 +90,7 @@ func (h *HTTPHandler) Get(writer http.ResponseWriter, request *http.Request) {
 func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	assignmentID, ok := mux.Vars(request)[paths.AssignmentsIDParam]
+	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
 	if !ok {
 		log.Info().Println("failed to get assignment id path parameter")
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -130,7 +130,7 @@ func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 func (h *HTTPHandler) Delete(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	assignmentID, ok := mux.Vars(request)[paths.AssignmentsIDParam]
+	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
 	if !ok {
 		log.Info().Println("failed to get assignment id path parameter")
 		writer.WriteHeader(http.StatusInternalServerError)

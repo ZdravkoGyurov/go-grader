@@ -2,6 +2,7 @@ package login
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 )
 
 type userDBHandler interface {
-	Read(ctx context.Context, username string) (*models.User, error)
+	ReadByUsername(ctx context.Context, username string) (*models.User, error)
 }
 
 type sessionDBHandler interface {
@@ -41,6 +42,13 @@ func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler, sessionHand
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
+	_, err := request.Cookie(h.appCtx.Cfg.SessionCookieName)
+	if err == nil {
+		log.Warning().Println(errors.New("failed to login logged in user"))
+		writer.WriteHeader(http.StatusOK)
+		return
+	}
+
 	username, password, ok := request.BasicAuth()
 	if !ok {
 		log.Error().Println("failed to get username and password from authorization header")
@@ -48,7 +56,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	user, err := h.userDBHandler.Read(ctx, username)
+	user, err := h.userDBHandler.ReadByUsername(ctx, username)
 	if err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
