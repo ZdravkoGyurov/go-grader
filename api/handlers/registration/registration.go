@@ -46,12 +46,12 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	user := models.User{
-		ID:       uuid.NewString(),
-		Username: username,
-		Fullname: "fullname", // TODO: get from body
-		Password: string(hash),
-		Role:     "STUDENT", // TODO: add roles
-		Disabled: false,
+		ID:          uuid.NewString(),
+		Username:    username,
+		Fullname:    "fullname", // TODO: get from body
+		Password:    string(hash),
+		Permissions: []string{"STUDENT"}, // TODO: add permissions
+		Disabled:    false,
 	}
 
 	if err := h.userDBHandler.Create(ctx, &user); err != nil {
