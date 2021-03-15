@@ -9,8 +9,8 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/api/middlewares/authn"
 	"github.com/ZdravkoGyurov/go-grader/api/middlewares/authz"
 	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/db"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/db"
 )
 
 // New creates a mux router with configured routes

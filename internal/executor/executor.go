@@ -4,9 +4,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/ZdravkoGyurov/go-grader/app/config"
-	"github.com/ZdravkoGyurov/go-grader/log"
-	"github.com/ZdravkoGyurov/go-grader/random"
+	"github.com/ZdravkoGyurov/go-grader/internal/app/config"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
 
 // StopFunc ...

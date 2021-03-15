@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/db/models"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/models"
 )
 
 // DBHandler ...

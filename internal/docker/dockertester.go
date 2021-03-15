@@ -3,7 +3,7 @@ package docker
 import (
 	"fmt"
 
-	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 type ExecuteTestsConfig struct {

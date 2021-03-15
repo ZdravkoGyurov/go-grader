@@ -6,9 +6,9 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/account/registration"
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/assignment"
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/testrun"
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/db"
-	"github.com/ZdravkoGyurov/go-grader/executor"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/db"
+	"github.com/ZdravkoGyurov/go-grader/internal/executor"
 )
 
 type Handlers struct {

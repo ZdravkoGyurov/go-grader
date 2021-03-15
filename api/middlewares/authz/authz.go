@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/api/req"
-	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 const (

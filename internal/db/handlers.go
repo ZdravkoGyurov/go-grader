@@ -3,10 +3,10 @@ package db
 import (
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/db/handlers/assignment"
-	"github.com/ZdravkoGyurov/go-grader/db/handlers/session"
-	"github.com/ZdravkoGyurov/go-grader/db/handlers/user"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/assignment"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/session"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/user"
 )
 
 type Handlers struct {

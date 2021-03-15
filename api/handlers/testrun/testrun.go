@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/docker"
-	"github.com/ZdravkoGyurov/go-grader/log"
-	"github.com/ZdravkoGyurov/go-grader/random"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/docker"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
 
 type testRunDBHandler interface {

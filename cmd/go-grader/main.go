@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/ZdravkoGyurov/go-grader/api"
 	"github.com/ZdravkoGyurov/go-grader/api/router"
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/db"
-	"github.com/ZdravkoGyurov/go-grader/executor"
-	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/db"
+	"github.com/ZdravkoGyurov/go-grader/internal/executor"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 func main() {

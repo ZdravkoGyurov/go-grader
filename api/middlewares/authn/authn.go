@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/api/req"
-	"github.com/ZdravkoGyurov/go-grader/app"
-	"github.com/ZdravkoGyurov/go-grader/db/handlers/session"
-	"github.com/ZdravkoGyurov/go-grader/db/handlers/user"
-	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/session"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/user"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 type middleware struct {

@@ -3,7 +3,7 @@ package account
 import (
 	"net/http"
 
-	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/internal/app"
 )
 
 func UserLoggedIn(appCtx app.Context, request *http.Request) bool {

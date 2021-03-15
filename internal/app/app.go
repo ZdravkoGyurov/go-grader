@@ -11,9 +11,9 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/ZdravkoGyurov/go-grader/app/config"
-	"github.com/ZdravkoGyurov/go-grader/executor"
-	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/internal/app/config"
+	"github.com/ZdravkoGyurov/go-grader/internal/executor"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 // Context ...
@@ -28,6 +28,8 @@ func NewContext() Context {
 	cfg := config.Config{
 		Host:                      "localhost",
 		Port:                      8080,
+		ServerReadTimeout:         30 * time.Second,
+		ServerWriteTimeout:        30 * time.Second,
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
 		DatabaseURI:               "mongodb://localhost:27017",
@@ -61,8 +63,10 @@ type Application struct {
 func New(appCtx Context, exec *executor.Executor, dbClient *mongo.Client, handler http.Handler) *Application {
 	address := fmt.Sprintf("%s:%d", appCtx.Cfg.Host, appCtx.Cfg.Port)
 	server := &http.Server{
-		Addr:    address,
-		Handler: handler,
+		Addr:         address,
+		Handler:      handler,
+		ReadTimeout:  appCtx.Cfg.ServerReadTimeout,
+		WriteTimeout: appCtx.Cfg.ServerWriteTimeout,
 	}
 
 	return &Application{

@@ -9,8 +9,8 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
-	"github.com/ZdravkoGyurov/go-grader/db/models"
-	"github.com/ZdravkoGyurov/go-grader/log"
+	"github.com/ZdravkoGyurov/go-grader/internal/db/models"
+	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 type assignmentDBHandler interface {
