@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"grader/app/config"
-	"grader/executor"
-	"grader/log"
-
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/ZdravkoGyurov/go-grader/app/config"
+	"github.com/ZdravkoGyurov/go-grader/executor"
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 // Context ...
@@ -31,9 +31,12 @@ func NewContext() Context {
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
 		GithubTestsRepo:           "",
+		DatabaseURI:               "mongodb://localhost:27017",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
+		DatabaseName:              "grader",
 		ServerShutdownTimeout:     5 * time.Second,
+		SessionCookieName:         "Grader",
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

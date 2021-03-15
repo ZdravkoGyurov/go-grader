@@ -2,7 +2,8 @@ package docker
 
 import (
 	"fmt"
-	"grader/log"
+
+	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
 // ExecuteTests ...

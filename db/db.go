@@ -2,16 +2,17 @@ package db
 
 import (
 	"context"
-	"grader/app"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+
+	"github.com/ZdravkoGyurov/go-grader/app"
 )
 
 // Connect ...
 func Connect(appCtx app.Context) (*mongo.Client, error) {
-	options := options.Client().ApplyURI("mongodb://localhost:27017")
+	options := options.Client().ApplyURI(appCtx.Cfg.DatabaseURI)
 
 	ctx, cancel := context.WithTimeout(appCtx.Context, appCtx.Cfg.DBConnectTimeout)
 	defer cancel()

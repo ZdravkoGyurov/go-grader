@@ -3,11 +3,11 @@ package db_test
 import (
 	"testing"
 
-	"grader/app"
-	"grader/db"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/ZdravkoGyurov/go-grader/app"
+	"github.com/ZdravkoGyurov/go-grader/db"
 )
 
 func TestBooks(t *testing.T) {

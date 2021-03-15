@@ -1,9 +1,13 @@
 package paths
 
 const (
-	AssignmentsIDParam = "id"
-	Assignments        = "/assignments"
-	AssignmentsWithID  = "/assignments/{" + AssignmentsIDParam + "}"
+	Register = "/register"
+	Login    = "/login"
+	Logout   = "/logout"
+
+	AssignmentIDParam = "id"
+	Assignment        = "/assignment"
+	AssignmentWithID  = "/assignment/{" + AssignmentIDParam + "}"
 
 	TestRun = "/testrun"
 )

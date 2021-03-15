@@ -8,8 +8,11 @@ type Config struct {
 	Port                      int
 	MaxExecutorWorkers        int
 	MaxExecutorConcurrentJobs int
+	DatabaseURI               string
 	DBConnectTimeout          time.Duration
 	DBDisconnectTimeout       time.Duration
+	DatabaseName              string
 	ServerShutdownTimeout     time.Duration
 	GithubTestsRepo           string
+	SessionCookieName         string
 }
