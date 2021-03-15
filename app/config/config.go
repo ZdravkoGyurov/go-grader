@@ -13,6 +13,7 @@ type Config struct {
 	DBDisconnectTimeout       time.Duration
 	DatabaseName              string
 	ServerShutdownTimeout     time.Duration
-	GithubTestsRepo           string
 	SessionCookieName         string
+	TestsGitUser              string
+	TestsGitRepo              string
 }

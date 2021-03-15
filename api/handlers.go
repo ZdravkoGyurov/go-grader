@@ -25,6 +25,6 @@ func NewHandlers(appCtx app.Context, dbHandler db.Handlers, exec *executor.Execu
 		Login:        login.NewHTTPHandler(appCtx, dbHandler.User, dbHandler.Session),
 		Logout:       logout.NewHTTPHandler(appCtx, dbHandler.Session),
 		Registration: registration.NewHTTPHandler(appCtx, dbHandler.User),
-		TestRun:      testrun.NewHTTPHandler(exec),
+		TestRun:      testrun.NewHTTPHandler(appCtx, exec),
 	}
 }

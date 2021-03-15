@@ -30,13 +30,14 @@ func NewContext() Context {
 		Port:                      8080,
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
-		GithubTestsRepo:           "",
 		DatabaseURI:               "mongodb://localhost:27017",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
 		DatabaseName:              "grader",
 		ServerShutdownTimeout:     5 * time.Second,
 		SessionCookieName:         "Grader",
+		TestsGitUser:              "ZdravkoGyurov",
+		TestsGitRepo:              "grader-docker-tests",
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

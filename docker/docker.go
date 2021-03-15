@@ -7,19 +7,22 @@ import (
 )
 
 // BuildAssignmentImage ...
-func BuildAssignmentImage(gitUser, gitRepo, assignment, imageName string) error {
+func BuildAssignmentImage(testsCfg ExecuteTestsConfig) (string, error) {
 	cmd := exec.Command("docker", "build",
-		"-t", imageName,
-		"--build-arg", fmt.Sprintf("gitUser=%s", gitUser),
-		"--build-arg", fmt.Sprintf("gitRepo=%s", gitRepo),
-		"--build-arg", fmt.Sprintf("assignment=%s", assignment),
-		".")
+		"--no-cache",
+		"-t", testsCfg.ImageName,
+		"--build-arg", fmt.Sprintf("assignment=%s", testsCfg.Assignment),
+		"--build-arg", fmt.Sprintf("solutionGitUser=%s", testsCfg.SolutionGitUser),
+		"--build-arg", fmt.Sprintf("solutionGitRepo=%s", testsCfg.SolutionGitRepo),
+		"--build-arg", fmt.Sprintf("testsGitUser=%s", testsCfg.TestsGitUser),
+		"--build-arg", fmt.Sprintf("testsGitRepo=%s", testsCfg.TestsGitRepo),
+		"./docker")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
 
-	_, err := cmd.CombinedOutput()
-	return err
+	output, err := cmd.CombinedOutput()
+	return string(output), err
 }
 
 // RunImage runs docker container with given imageName and containerName

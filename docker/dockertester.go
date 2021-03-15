@@ -6,19 +6,29 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/log"
 )
 
-// ExecuteTests ...
-func ExecuteTests(imageName, containerName string) (string, error) {
-	err := BuildAssignmentImage("ZdravkoGyurov", "docker-tests", "assignment1", imageName)
-	if err != nil {
-		return "", fmt.Errorf("failed docker build: %w", err)
-	}
-	defer handleRemoveImage(imageName)
+type ExecuteTestsConfig struct {
+	ImageName       string
+	ContainerName   string
+	Assignment      string
+	SolutionGitUser string
+	SolutionGitRepo string
+	TestsGitUser    string
+	TestsGitRepo    string
+}
 
-	output, err := RunImage(imageName, containerName)
-	if err != nil && false { // TODO: check additionally if error was from test fail
-		return "", fmt.Errorf("failed docker run: %w", err)
+// ExecuteTests ...
+func ExecuteTests(testsCfg ExecuteTestsConfig) (string, error) {
+	output, err := BuildAssignmentImage(testsCfg)
+	if err != nil {
+		return output, fmt.Errorf("failed docker build: %w", err)
 	}
-	defer handleRemoveContainer(containerName)
+	defer handleRemoveImage(testsCfg.ImageName)
+
+	output, err = RunImage(testsCfg.ImageName, testsCfg.ContainerName)
+	if err != nil && false { // TODO: check additionally if error was from test fail
+		return output, fmt.Errorf("failed docker run: %w", err)
+	}
+	defer handleRemoveContainer(testsCfg.ContainerName)
 
 	return output, nil
 }

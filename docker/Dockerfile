@@ -1,20 +1,20 @@
 FROM golang:alpine3.13
 
-ARG gitUser=ZdravkoGyurov
-ARG gitRepo=docker-tests
 ARG assignment=assignment1
+ARG solutionGitUser=ZdravkoGyurov
+ARG solutionGitRepo=grader-docker-solutions
+ARG testsGitUser=ZdravkoGyurov
+ARG testsGitRepo=grader-docker-tests
 
 ENV ASSIGNMENT ${assignment}
 
 WORKDIR /app
 
-COPY ./go.mod /app/go.mod
-COPY ./go.sum /app/go.sum
-COPY ./tests/${assignment}/* /app/${assignment}/
-
 RUN apk update && apk upgrade && apk add --no-cache git docker-cli
 
-RUN git clone https://github.com/${gitUser}/${gitRepo}.git
-RUN mv ${gitRepo}/${assignment}/* /app/${assignment}/
+RUN git clone https://github.com/${solutionGitUser}/${solutionGitRepo}.git
+RUN git clone https://github.com/${testsGitUser}/${testsGitRepo}.git
+RUN cp -r ./${solutionGitRepo}/$ASSIGNMENT/* . && rm -rf ./${solutionGitRepo}
+RUN cp -r ./${testsGitRepo}/$ASSIGNMENT/* . && rm -rf ./${testsGitRepo}
 
-ENTRYPOINT go test /app/$ASSIGNMENT/calc_test.go
+ENTRYPOINT go test -v ./...
