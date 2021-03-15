@@ -40,9 +40,9 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		testsCfg := docker.ExecuteTestsConfig{
 			ImageName:       random.String(),
 			ContainerName:   random.String(),
-			Assignment:      "assignment1",
-			SolutionGitUser: "ZdravkoGyurov",
-			SolutionGitRepo: "grader-docker-solutions",
+			Assignment:      "assignment1",             // get from body
+			SolutionGitUser: "ZdravkoGyurov",           // get from db/user
+			SolutionGitRepo: "grader-docker-solutions", // get from db/course
 			TestsGitUser:    h.appCtx.Cfg.TestsGitUser,
 			TestsGitRepo:    h.appCtx.Cfg.TestsGitRepo,
 		}
