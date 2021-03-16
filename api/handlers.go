@@ -6,9 +6,9 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/account/registration"
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/assignment"
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/testrun"
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
-	"github.com/ZdravkoGyurov/go-grader/internal/db"
-	"github.com/ZdravkoGyurov/go-grader/internal/executor"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
+	"github.com/ZdravkoGyurov/go-grader/pkg/executor"
+	"github.com/ZdravkoGyurov/go-grader/pkg/storage"
 )
 
 type Handlers struct {
@@ -19,12 +19,12 @@ type Handlers struct {
 	TestRun      *testrun.HTTPHandler
 }
 
-func NewHandlers(appCtx app.Context, dbHandler db.Handlers, exec *executor.Executor) *Handlers {
+func NewHandlers(appContext app.Context, storage *storage.Storage, exec *executor.Executor) *Handlers {
 	return &Handlers{
-		Assignment:   assignment.NewHTTPHandler(dbHandler.Assignment),
-		Login:        login.NewHTTPHandler(appCtx, dbHandler.User, dbHandler.Session),
-		Logout:       logout.NewHTTPHandler(appCtx, dbHandler.Session),
-		Registration: registration.NewHTTPHandler(appCtx, dbHandler.User),
-		TestRun:      testrun.NewHTTPHandler(appCtx, exec),
+		Assignment:   assignment.NewHTTPHandler(storage),
+		Login:        login.NewHTTPHandler(appContext, storage),
+		Logout:       logout.NewHTTPHandler(appContext, storage),
+		Registration: registration.NewHTTPHandler(appContext, storage),
+		TestRun:      testrun.NewHTTPHandler(appContext, exec),
 	}
 }

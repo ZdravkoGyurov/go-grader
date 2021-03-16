@@ -9,26 +9,26 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
-	"github.com/ZdravkoGyurov/go-grader/internal/db/models"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
-type assignmentDBHandler interface {
-	Create(ctx context.Context, assignment *models.Assignment) error
-	Read(ctx context.Context, assignmentID string) (*models.Assignment, error)
-	Update(ctx context.Context, assignmentID string, assignment *models.Assignment) (*models.Assignment, error)
-	Delete(ctx context.Context, assignmentID string) error
+type assignmentStorage interface {
+	CreateAssignment(ctx context.Context, assignment *model.Assignment) error
+	ReadAssignment(ctx context.Context, assignmentID string) (*model.Assignment, error)
+	UpdateAssignment(ctx context.Context, assignmentID string, assignment *model.Assignment) (*model.Assignment, error)
+	DeleteAssignment(ctx context.Context, assignmentID string) error
 }
 
 // HTTPHandler ...
 type HTTPHandler struct {
-	assignmentDBHandler
+	assignmentStorage assignmentStorage
 }
 
 // NewHTTPHandler creates a new assignment http handler
-func NewHTTPHandler(assignmentDBHandler assignmentDBHandler) *HTTPHandler {
+func NewHTTPHandler(assignmentStorage assignmentStorage) *HTTPHandler {
 	return &HTTPHandler{
-		assignmentDBHandler: assignmentDBHandler,
+		assignmentStorage: assignmentStorage,
 	}
 }
 
@@ -36,7 +36,7 @@ func NewHTTPHandler(assignmentDBHandler assignmentDBHandler) *HTTPHandler {
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	var assignment models.Assignment
+	var assignment model.Assignment
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&assignment); err != nil {
 		log.Info().Printf("failed to decode assignment from request body: %s", err)
@@ -45,7 +45,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	}
 	assignment.ID = uuid.NewString()
 
-	if err := h.assignmentDBHandler.Create(ctx, &assignment); err != nil {
+	if err := h.assignmentStorage.CreateAssignment(ctx, &assignment); err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
@@ -67,7 +67,7 @@ func (h *HTTPHandler) Get(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	assignment, err := h.assignmentDBHandler.Read(ctx, assignmentID)
+	assignment, err := h.assignmentStorage.ReadAssignment(ctx, assignmentID)
 	if err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -97,7 +97,7 @@ func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	var updateAssignment models.Assignment
+	var updateAssignment model.Assignment
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&updateAssignment); err != nil {
 		log.Info().Printf("failed to decode assignment from request body: %s", err)
@@ -106,7 +106,7 @@ func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 	}
 	updateAssignment.ID = ""
 
-	updatedAssignment, err := h.assignmentDBHandler.Update(ctx, assignmentID, &updateAssignment)
+	updatedAssignment, err := h.assignmentStorage.UpdateAssignment(ctx, assignmentID, &updateAssignment)
 	if err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -137,7 +137,7 @@ func (h *HTTPHandler) Delete(writer http.ResponseWriter, request *http.Request) 
 		return
 	}
 
-	if err := h.assignmentDBHandler.Delete(ctx, assignmentID); err != nil {
+	if err := h.assignmentStorage.DeleteAssignment(ctx, assignmentID); err != nil {
 		log.Info().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return

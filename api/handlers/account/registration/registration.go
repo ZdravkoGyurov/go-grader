@@ -9,26 +9,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
-	"github.com/ZdravkoGyurov/go-grader/internal/db/models"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
-type userDBHandler interface {
-	Create(ctx context.Context, user *models.User) error
+type registrationStorage interface {
+	CreateUser(ctx context.Context, user *model.User) error
 }
 
 // HTTPHandler ...
 type HTTPHandler struct {
-	appCtx app.Context
-	userDBHandler
+	appContext app.Context
+	registrationStorage
 }
 
 // NewHTTPHandler creates a new registration http handler
-func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler) *HTTPHandler {
+func NewHTTPHandler(appContext app.Context, registrationStorage registrationStorage) *HTTPHandler {
 	return &HTTPHandler{
-		appCtx:        appCtx,
-		userDBHandler: userDBHandler,
+		appContext:          appContext,
+		registrationStorage: registrationStorage,
 	}
 }
 
@@ -36,7 +36,7 @@ func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler) *HTTPHandle
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	if account.UserLoggedIn(h.appCtx, request) {
+	if account.UserLoggedIn(h.appContext, request) {
 		log.Error().Println(errors.New("failed to register logged in user"))
 		writer.WriteHeader(http.StatusUnprocessableEntity)
 		return
@@ -56,7 +56,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	user := models.User{
+	user := model.User{
 		ID:          uuid.NewString(),
 		Username:    username,
 		Fullname:    "fullname", // TODO: get from body
@@ -65,7 +65,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		Disabled:    false,
 	}
 
-	if err := h.userDBHandler.Create(ctx, &user); err != nil {
+	if err := h.registrationStorage.CreateUser(ctx, &user); err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return

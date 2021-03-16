@@ -9,33 +9,28 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
-	"github.com/ZdravkoGyurov/go-grader/internal/db/models"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
 
-type userDBHandler interface {
-	ReadByUsername(ctx context.Context, username string) (*models.User, error)
-}
-
-type sessionDBHandler interface {
-	Create(ctx context.Context, session *models.Session) error
+type loginStorage interface {
+	ReadUserByUsername(ctx context.Context, username string) (*model.User, error)
+	CreateSession(ctx context.Context, session *model.Session) error
 }
 
 // HTTPHandler ...
 type HTTPHandler struct {
-	appCtx app.Context
-	userDBHandler
-	sessionDBHandler
+	appContext app.Context
+	loginStorage
 }
 
 // NewHTTPHandler creates a new login http handler
-func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler, sessionHandler sessionDBHandler) *HTTPHandler {
+func NewHTTPHandler(appContext app.Context, loginStorage loginStorage) *HTTPHandler {
 	return &HTTPHandler{
-		appCtx:           appCtx,
-		userDBHandler:    userDBHandler,
-		sessionDBHandler: sessionHandler,
+		appContext:   appContext,
+		loginStorage: loginStorage,
 	}
 }
 
@@ -43,7 +38,7 @@ func NewHTTPHandler(appCtx app.Context, userDBHandler userDBHandler, sessionHand
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	if account.UserLoggedIn(h.appCtx, request) {
+	if account.UserLoggedIn(h.appContext, request) {
 		log.Warning().Println(errors.New("failed to login logged in user"))
 		writer.WriteHeader(http.StatusOK)
 		return
@@ -56,7 +51,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	user, err := h.userDBHandler.ReadByUsername(ctx, username)
+	user, err := h.loginStorage.ReadUserByUsername(ctx, username)
 	if err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -69,11 +64,11 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	session := models.Session{
+	session := model.Session{
 		ID:     random.LongString(),
 		UserID: user.ID,
 	}
-	err = h.sessionDBHandler.Create(ctx, &session)
+	err = h.loginStorage.CreateSession(ctx, &session)
 	if err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -82,9 +77,9 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 
 	// TODO: make secure cookie
 	cookie := http.Cookie{
-		Name:     h.appCtx.Cfg.SessionCookieName,
+		Name:     h.appContext.Cfg.SessionCookieName,
 		Value:    session.ID,
-		Domain:   h.appCtx.Cfg.Host,
+		Domain:   h.appContext.Cfg.Host,
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour),
 		HttpOnly: true,

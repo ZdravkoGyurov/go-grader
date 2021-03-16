@@ -3,10 +3,10 @@ package account
 import (
 	"net/http"
 
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 )
 
-func UserLoggedIn(appCtx app.Context, request *http.Request) bool {
-	_, err := request.Cookie(appCtx.Cfg.SessionCookieName)
+func UserLoggedIn(appContext app.Context, request *http.Request) bool {
+	_, err := request.Cookie(appContext.Cfg.SessionCookieName)
 	return err == nil
 }

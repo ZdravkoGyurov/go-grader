@@ -3,30 +3,29 @@ package main
 import (
 	"github.com/ZdravkoGyurov/go-grader/api"
 	"github.com/ZdravkoGyurov/go-grader/api/router"
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
-	"github.com/ZdravkoGyurov/go-grader/internal/db"
-	"github.com/ZdravkoGyurov/go-grader/internal/executor"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
+	"github.com/ZdravkoGyurov/go-grader/pkg/executor"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/storage"
 )
 
 func main() {
-	appCtx := app.NewContext()
+	appContext := app.NewContext()
 
-	dbClient, err := db.Connect(appCtx)
+	storage, err := storage.New(appContext.Context, appContext.Cfg)
 	if err != nil {
 		log.Error().Fatalf("failed to connect to mongodb: %s", err)
 	}
 	log.Info().Println("connected to mongodb...")
 
-	exec := executor.New(appCtx.Cfg)
+	exec := executor.New(appContext.Cfg)
 	exec.Start()
 	log.Info().Println("Started job executor...")
 
-	dbHandler := db.NewHandlers(appCtx, dbClient)
-	httpHandler := api.NewHandlers(appCtx, *dbHandler, exec)
-	httpRouter := router.New(appCtx, dbHandler, httpHandler)
+	httpHandler := api.NewHandlers(appContext, storage, exec)
+	httpRouter := router.New(appContext, storage, httpHandler)
 
-	app := app.New(appCtx, exec, dbClient, httpRouter)
+	app := app.New(appContext, exec, storage, httpRouter)
 
 	app.Start()
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
-	"github.com/ZdravkoGyurov/go-grader/internal/docker"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
+	"github.com/ZdravkoGyurov/go-grader/pkg/docker"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
@@ -19,15 +19,15 @@ type executor interface {
 
 // HTTPHandler ...
 type HTTPHandler struct {
-	appCtx app.Context
+	appContext app.Context
 	executor
 }
 
 // NewHTTPHandler creates a new test run http handler
-func NewHTTPHandler(appCtx app.Context, executor executor) *HTTPHandler {
+func NewHTTPHandler(appContext app.Context, executor executor) *HTTPHandler {
 	return &HTTPHandler{
-		appCtx:   appCtx,
-		executor: executor,
+		appContext: appContext,
+		executor:   executor,
 	}
 }
 
@@ -43,8 +43,8 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 			Assignment:      "assignment1",             // get from body
 			SolutionGitUser: "ZdravkoGyurov",           // get from db/user
 			SolutionGitRepo: "grader-docker-solutions", // get from db/course
-			TestsGitUser:    h.appCtx.Cfg.TestsGitUser,
-			TestsGitRepo:    h.appCtx.Cfg.TestsGitRepo,
+			TestsGitUser:    h.appContext.Cfg.TestsGitUser,
+			TestsGitRepo:    h.appContext.Cfg.TestsGitRepo,
 		}
 		output, err := docker.ExecuteTests(testsCfg)
 		if err != nil {

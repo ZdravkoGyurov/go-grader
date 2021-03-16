@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/ZdravkoGyurov/go-grader/internal/app/config"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app/config"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )

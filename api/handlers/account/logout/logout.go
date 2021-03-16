@@ -7,25 +7,25 @@ import (
 	"time"
 
 	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
-type sessionDBHandler interface {
-	Delete(ctx context.Context, sessionID string) error
+type logoutStorage interface {
+	DeleteSession(ctx context.Context, sessionID string) error
 }
 
 // HTTPHandler ...
 type HTTPHandler struct {
-	appCtx app.Context
-	sessionDBHandler
+	appContext app.Context
+	logoutStorage
 }
 
 // NewHTTPHandler creates a new logout http handler
-func NewHTTPHandler(appCtx app.Context, sessionDBHandler sessionDBHandler) *HTTPHandler {
+func NewHTTPHandler(appContext app.Context, logoutStorage logoutStorage) *HTTPHandler {
 	return &HTTPHandler{
-		appCtx:           appCtx,
-		sessionDBHandler: sessionDBHandler,
+		appContext:    appContext,
+		logoutStorage: logoutStorage,
 	}
 }
 
@@ -33,7 +33,7 @@ func NewHTTPHandler(appCtx app.Context, sessionDBHandler sessionDBHandler) *HTTP
 func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	if !account.UserLoggedIn(h.appCtx, request) {
+	if !account.UserLoggedIn(h.appContext, request) {
 		log.Warning().Println(errors.New("failed to logout logged out user"))
 		writer.WriteHeader(http.StatusOK)
 		return
@@ -47,14 +47,14 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	sessionID := cookie.Value
-	if err := h.sessionDBHandler.Delete(ctx, sessionID); err != nil {
+	if err := h.logoutStorage.DeleteSession(ctx, sessionID); err != nil {
 		log.Error().Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	expiredCookie := http.Cookie{
-		Name:    h.appCtx.Cfg.SessionCookieName,
+		Name:    h.appContext.Cfg.SessionCookieName,
 		Expires: time.Now().Add(-time.Hour),
 	}
 	http.SetCookie(writer, &expiredCookie)

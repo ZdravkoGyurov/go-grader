@@ -9,11 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/ZdravkoGyurov/go-grader/internal/app/config"
-	"github.com/ZdravkoGyurov/go-grader/internal/executor"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app/config"
+	"github.com/ZdravkoGyurov/go-grader/pkg/executor"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/storage"
 )
 
 // Context ...
@@ -53,27 +52,27 @@ func NewContext() Context {
 
 // Application ...
 type Application struct {
-	appCtx   Context
-	exec     *executor.Executor
-	dbClient *mongo.Client
-	server   *http.Server
+	appContext Context
+	exec       *executor.Executor
+	storage    *storage.Storage
+	server     *http.Server
 }
 
 // New ...
-func New(appCtx Context, exec *executor.Executor, dbClient *mongo.Client, handler http.Handler) *Application {
-	address := fmt.Sprintf("%s:%d", appCtx.Cfg.Host, appCtx.Cfg.Port)
+func New(appContext Context, exec *executor.Executor, storage *storage.Storage, handler http.Handler) *Application {
+	address := fmt.Sprintf("%s:%d", appContext.Cfg.Host, appContext.Cfg.Port)
 	server := &http.Server{
 		Addr:         address,
 		Handler:      handler,
-		ReadTimeout:  appCtx.Cfg.ServerReadTimeout,
-		WriteTimeout: appCtx.Cfg.ServerWriteTimeout,
+		ReadTimeout:  appContext.Cfg.ServerReadTimeout,
+		WriteTimeout: appContext.Cfg.ServerWriteTimeout,
 	}
 
 	return &Application{
-		appCtx:   appCtx,
-		exec:     exec,
-		dbClient: dbClient,
-		server:   server,
+		appContext: appContext,
+		exec:       exec,
+		storage:    storage,
+		server:     server,
 	}
 }
 
@@ -88,7 +87,7 @@ func (a *Application) Start() {
 	}()
 	log.Info().Println("Application started...")
 
-	<-a.appCtx.Context.Done()
+	<-a.appContext.Context.Done()
 
 	a.stopExecutor()
 	a.disconnectFromDB()
@@ -98,7 +97,7 @@ func (a *Application) Start() {
 
 // Stop ...
 func (a *Application) Stop() {
-	a.appCtx.Cancel()
+	a.appContext.Cancel()
 }
 
 func (a *Application) setupSignalNotifier() {
@@ -107,7 +106,7 @@ func (a *Application) setupSignalNotifier() {
 	go func() {
 		<-signalChannel
 		log.Info().Println("Stopping application...")
-		a.appCtx.Cancel()
+		a.appContext.Cancel()
 	}()
 }
 
@@ -117,17 +116,12 @@ func (a *Application) stopExecutor() {
 }
 
 func (a *Application) disconnectFromDB() {
-	dbDisconnectCtx, cancel := context.WithTimeout(context.Background(), a.appCtx.Cfg.DBDisconnectTimeout)
-	defer cancel()
-	err := a.dbClient.Disconnect(dbDisconnectCtx)
-	if err != nil {
-		log.Info().Printf("failed to disconnect from db: %s\n", err)
-	}
+	a.storage.Disconnect()
 	log.Info().Println("Disconnected from DB")
 }
 
 func (a *Application) shutdownServer() {
-	ctx, cancel := context.WithTimeout(context.Background(), a.appCtx.Cfg.ServerShutdownTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), a.appContext.Cfg.ServerShutdownTimeout)
 	defer cancel()
 	if err := a.server.Shutdown(ctx); err != nil {
 		log.Error().Fatalf("failed to shutdown http server: %s\n", err)

@@ -1,26 +1,29 @@
 package authn
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/api/req"
-	"github.com/ZdravkoGyurov/go-grader/internal/app"
-	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/session"
-	"github.com/ZdravkoGyurov/go-grader/internal/db/handlers/user"
+	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
-type middleware struct {
-	appCtx           app.Context
-	sessionDBHandler *session.DBHandler
-	userDBHandler    *user.DBHandler
+type authnStorage interface {
+	ReadSession(ctx context.Context, sessionID string) (*model.Session, error)
+	ReadUserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
-func Middleware(appCtx app.Context, sessionDBHandler *session.DBHandler, userDBHandler *user.DBHandler) func(http.Handler) http.Handler {
+type middleware struct {
+	appContext   app.Context
+	authnStorage authnStorage
+}
+
+func Middleware(appContext app.Context, authnStorage authnStorage) func(http.Handler) http.Handler {
 	mw := &middleware{
-		appCtx:           appCtx,
-		sessionDBHandler: sessionDBHandler,
-		userDBHandler:    userDBHandler,
+		appContext:   appContext,
+		authnStorage: authnStorage,
 	}
 	return mw.authenticate
 }
@@ -28,7 +31,7 @@ func Middleware(appCtx app.Context, sessionDBHandler *session.DBHandler, userDBH
 func (m middleware) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()
-		cookie, err := request.Cookie(m.appCtx.Cfg.SessionCookieName)
+		cookie, err := request.Cookie(m.appContext.Cfg.SessionCookieName)
 		if err != nil {
 			log.Error().Println(err)
 			writer.WriteHeader(http.StatusUnauthorized)
@@ -36,14 +39,14 @@ func (m middleware) authenticate(next http.Handler) http.Handler {
 		}
 
 		sessionID := cookie.Value
-		session, err := m.sessionDBHandler.Read(ctx, sessionID)
+		session, err := m.authnStorage.ReadSession(ctx, sessionID)
 		if err != nil {
 			log.Error().Println(err)
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		user, err := m.userDBHandler.ReadByID(ctx, session.UserID)
+		user, err := m.authnStorage.ReadUserByID(ctx, session.UserID)
 		if err != nil {
 			log.Error().Println(err)
 			writer.WriteHeader(http.StatusInternalServerError)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/docker/docker/client"
 )
 
 type ExecuteTestsConfig struct {
@@ -18,6 +19,7 @@ type ExecuteTestsConfig struct {
 
 // ExecuteTests ...
 func ExecuteTests(testsCfg ExecuteTestsConfig) (string, error) {
+	client.NewEnvClient()
 	output, err := BuildAssignmentImage(testsCfg)
 	if err != nil {
 		return output, fmt.Errorf("failed docker build: %w", err)
