@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/ZdravkoGyurov/go-grader/api/handlers"
+	"github.com/ZdravkoGyurov/go-grader/api/middlewares"
 	"github.com/ZdravkoGyurov/go-grader/api/router"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/executor"
@@ -23,7 +24,8 @@ func main() {
 	log.Info().Println("Started job executor...")
 
 	httpHandlers := handlers.NewHandlers(appContext, storage, exec)
-	httpRouter := router.New(appContext, storage, httpHandlers)
+	httpMiddlewares := middlewares.NewMiddlewares(appContext, storage)
+	httpRouter := router.New(appContext, httpHandlers, httpMiddlewares)
 
 	app := app.New(appContext, exec, storage, httpRouter)
 

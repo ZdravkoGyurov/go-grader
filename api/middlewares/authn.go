@@ -1,4 +1,4 @@
-package authn
+package middlewares
 
 import (
 	"context"
@@ -15,20 +15,12 @@ type authnStorage interface {
 	ReadUserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
-type middleware struct {
+type authnMiddleware struct {
 	appContext   app.Context
 	authnStorage authnStorage
 }
 
-func Middleware(appContext app.Context, authnStorage authnStorage) func(http.Handler) http.Handler {
-	mw := &middleware{
-		appContext:   appContext,
-		authnStorage: authnStorage,
-	}
-	return mw.authenticate
-}
-
-func (m middleware) authenticate(next http.Handler) http.Handler {
+func (m authnMiddleware) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()
 		cookie, err := request.Cookie(m.appContext.Cfg.SessionCookieName)

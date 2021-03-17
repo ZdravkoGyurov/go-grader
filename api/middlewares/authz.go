@@ -1,4 +1,4 @@
-package authz
+package middlewares
 
 import (
 	"errors"
@@ -18,18 +18,11 @@ const (
 	CreateTestRunPermission = "CREATE_TESTRUN"
 )
 
-type middleware struct {
-	requiredPermissions []string
+type AuthzMiddleware struct {
+	RequiredPermissions []string
 }
 
-func Middleware(requiredPermissions ...string) func(http.Handler) http.Handler {
-	mw := &middleware{
-		requiredPermissions: requiredPermissions,
-	}
-	return mw.authorize
-}
-
-func (m middleware) authorize(next http.Handler) http.Handler {
+func (m AuthzMiddleware) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		userPermissions, ok := req.GetPermissions(request)
 		if !ok {
@@ -39,7 +32,7 @@ func (m middleware) authorize(next http.Handler) http.Handler {
 		}
 
 		userPermMap := permissionsMap(userPermissions...)
-		for _, perm := range m.requiredPermissions {
+		for _, perm := range m.RequiredPermissions {
 			if _, ok := userPermMap[perm]; !ok {
 				log.Error().Println(fmt.Errorf("failed to authorize user, missing %s permission", perm))
 				writer.WriteHeader(http.StatusForbidden)
