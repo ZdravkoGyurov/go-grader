@@ -19,15 +19,15 @@ func main() {
 	}
 	log.Info().Println("connected to mongodb...")
 
-	exec := executor.New(appContext.Cfg)
-	exec.Start()
+	exe := executor.New(appContext.Cfg)
+	exe.Start()
 	log.Info().Println("Started job executor...")
 
-	httpHandlers := handlers.NewHandlers(appContext, storage, exec)
+	httpHandlers := handlers.NewHandlers(appContext, storage, exe)
 	httpMiddlewares := middlewares.NewMiddlewares(appContext, storage)
 	httpRouter := router.New(appContext, httpHandlers, httpMiddlewares)
 
-	app := app.New(appContext, exec, storage, httpRouter)
+	app := app.New(appContext, exe, storage, httpRouter)
 
 	app.Start()
 }

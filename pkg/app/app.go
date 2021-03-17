@@ -50,12 +50,12 @@ func NewContext() Context {
 
 type Application struct {
 	appContext Context
-	exec       *executor.Executor
+	exe        *executor.Executor
 	storage    *storage.Storage
 	server     *http.Server
 }
 
-func New(appContext Context, exec *executor.Executor, storage *storage.Storage, handler http.Handler) *Application {
+func New(appContext Context, exe *executor.Executor, storage *storage.Storage, handler http.Handler) *Application {
 	address := fmt.Sprintf("%s:%d", appContext.Cfg.Host, appContext.Cfg.Port)
 	server := &http.Server{
 		Addr:         address,
@@ -66,7 +66,7 @@ func New(appContext Context, exec *executor.Executor, storage *storage.Storage, 
 
 	return &Application{
 		appContext: appContext,
-		exec:       exec,
+		exe:        exe,
 		storage:    storage,
 		server:     server,
 	}
@@ -105,7 +105,7 @@ func (a *Application) setupSignalNotifier() {
 }
 
 func (a *Application) stopExecutor() {
-	a.exec.Stop()
+	a.exe.Stop()
 	log.Info().Println("Executor stopped")
 }
 

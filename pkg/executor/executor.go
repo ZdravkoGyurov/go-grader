@@ -24,14 +24,12 @@ type Executor struct {
 
 // New creates an executor with workers
 func New(cfg config.Config) *Executor {
-	e := &Executor{
+	return &Executor{
 		wg:      sync.WaitGroup{},
 		jobs:    make(chan job, cfg.MaxExecutorConcurrentJobs),
 		stopped: false,
 		cfg:     cfg,
 	}
-
-	return e
 }
 
 func (e *Executor) Start() {
