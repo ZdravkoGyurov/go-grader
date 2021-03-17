@@ -14,6 +14,7 @@ import (
 // New creates a mux router with configured routes
 func New(appContext app.Context, handlers *handlers.Handlers, mws *middlewares.Middlewares) *mux.Router {
 	r := mux.NewRouter()
+	r.Use(middlewares.PanicRecovery)
 	setupAccountRoutes(r, appContext, handlers)
 	setupAssignmentRoutes(r, appContext, handlers, mws)
 	setupTestRunRoutes(r, appContext, handlers, mws)

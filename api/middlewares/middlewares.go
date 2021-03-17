@@ -7,15 +7,15 @@ import (
 )
 
 type Middlewares struct {
-	Authentication *authnMiddleware
+	authentication *authnMiddleware
 }
 
 func NewMiddlewares(appContext app.Context, storage *storage.Storage) *Middlewares {
 	return &Middlewares{
-		Authentication: &authnMiddleware{appContext: appContext, authnStorage: storage},
+		authentication: &authnMiddleware{appContext: appContext, authnStorage: storage},
 	}
 }
 
 func (m *Middlewares) ApplyAll(router *mux.Router) {
-	router.Use(m.Authentication.authenticate)
+	router.Use(m.authentication.authenticate)
 }
