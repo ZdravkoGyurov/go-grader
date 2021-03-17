@@ -10,7 +10,7 @@ ENV ASSIGNMENT ${assignment}
 
 WORKDIR /app
 
-RUN apk update && apk upgrade && apk add --no-cache git docker-cli
+RUN apk update && apk upgrade && apk add --no-cache git
 
 RUN git clone https://github.com/${solutionGitUser}/${solutionGitRepo}.git
 RUN git clone https://github.com/${testsGitUser}/${testsGitRepo}.git

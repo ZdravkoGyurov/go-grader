@@ -7,7 +7,7 @@ import (
 )
 
 // BuildAssignmentImage ...
-func BuildAssignmentImage(testsCfg ExecuteTestsConfig) (string, error) {
+func BuildAssignmentImage(testsCfg ExecuteTestsConfig, dockerfile string) (string, error) {
 	cmd := exec.Command("docker", "build",
 		"--no-cache",
 		"-t", testsCfg.ImageName,
@@ -16,7 +16,7 @@ func BuildAssignmentImage(testsCfg ExecuteTestsConfig) (string, error) {
 		"--build-arg", fmt.Sprintf("solutionGitRepo=%s", testsCfg.SolutionGitRepo),
 		"--build-arg", fmt.Sprintf("testsGitUser=%s", testsCfg.TestsGitUser),
 		"--build-arg", fmt.Sprintf("testsGitRepo=%s", testsCfg.TestsGitRepo),
-		"./docker")
+		dockerfile)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}

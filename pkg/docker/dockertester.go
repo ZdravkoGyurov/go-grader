@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
-	"github.com/docker/docker/client"
 )
 
 type ExecuteTestsConfig struct {
@@ -19,8 +18,7 @@ type ExecuteTestsConfig struct {
 
 // ExecuteTests ...
 func ExecuteTests(testsCfg ExecuteTestsConfig) (string, error) {
-	client.NewEnvClient()
-	output, err := BuildAssignmentImage(testsCfg)
+	output, err := BuildAssignmentImage(testsCfg, "pkg/docker/.")
 	if err != nil {
 		return output, fmt.Errorf("failed docker build: %w", err)
 	}
@@ -37,12 +35,12 @@ func ExecuteTests(testsCfg ExecuteTestsConfig) (string, error) {
 
 func handleRemoveImage(imageName string) {
 	if err := RemoveImage(imageName); err != nil {
-		log.Info().Printf("failed docker image rm: %s", err)
+		log.Error().Printf("failed docker image rm: %s", err)
 	}
 }
 
 func handleRemoveContainer(containerName string) {
 	if err := RemoveContainer(containerName); err != nil {
-		log.Info().Printf("failed docker rm: %s", err)
+		log.Error().Printf("failed docker rm: %s", err)
 	}
 }

@@ -1,3 +1,9 @@
-https://medium.com/@andreacolangelo/sibling-docker-container-2e664858f87a
+##Run MongoDB in docker:
+```bash
+docker run -d -p 27017:27017 mongo
+```
 
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock calc-tests-img sh
+##Run in docker:
+```bash
+docker build -t go-grader . && docker run -it -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock go-grader
+```

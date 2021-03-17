@@ -79,7 +79,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	cookie := http.Cookie{
 		Name:     h.appContext.Cfg.SessionCookieName,
 		Value:    session.ID,
-		Domain:   h.appContext.Cfg.Host,
+		Domain:   "localhost",
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour),
 		HttpOnly: true,

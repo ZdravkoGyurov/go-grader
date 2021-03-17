@@ -25,13 +25,13 @@ type Context struct {
 // NewContext ...
 func NewContext() Context {
 	cfg := config.Config{
-		Host:                      "localhost",
+		Host:                      "0.0.0.0",
 		Port:                      8080,
 		ServerReadTimeout:         30 * time.Second,
 		ServerWriteTimeout:        30 * time.Second,
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
-		DatabaseURI:               "mongodb://localhost:27017",
+		DatabaseURI:               "mongodb://host.docker.internal:27017",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
 		DatabaseName:              "grader",
