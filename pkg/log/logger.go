@@ -49,25 +49,21 @@ func init() {
 	logger = log.Default()
 }
 
-// Error ...
 func Error() *log.Logger {
 	setColoredPrefix(logger, errorPrefix)
 	return logger
 }
 
-// Warning ...
 func Warning() *log.Logger {
 	setColoredPrefix(logger, warningPrefix)
 	return logger
 }
 
-// Info ...
 func Info() *log.Logger {
 	setColoredPrefix(logger, infoPrefix)
 	return logger
 }
 
-// Debug ...
 func Debug() *log.Logger {
 	setColoredPrefix(logger, debugPrefix)
 	return logger

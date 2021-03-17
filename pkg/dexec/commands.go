@@ -1,4 +1,4 @@
-package docker
+package dexec
 
 import (
 	"fmt"
@@ -6,8 +6,7 @@ import (
 	"syscall"
 )
 
-// BuildAssignmentImage ...
-func BuildAssignmentImage(testsCfg ExecuteTestsConfig, dockerfile string) (string, error) {
+func buildAssignmentImage(testsCfg TestsRunConfig, dockerfile string) (string, error) {
 	cmd := exec.Command("docker", "build",
 		"--no-cache",
 		"-t", testsCfg.ImageName,
@@ -25,8 +24,7 @@ func BuildAssignmentImage(testsCfg ExecuteTestsConfig, dockerfile string) (strin
 	return string(output), err
 }
 
-// RunImage runs docker container with given imageName and containerName
-func RunImage(imageName, containerName string) (string, error) {
+func runImage(imageName, containerName string) (string, error) {
 	cmd := exec.Command("docker", "run", "--name", containerName, imageName)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
@@ -36,8 +34,7 @@ func RunImage(imageName, containerName string) (string, error) {
 	return string(bytes), err
 }
 
-// RemoveContainer removes container with given name
-func RemoveContainer(containerName string) error {
+func removeContainer(containerName string) error {
 	cmd := exec.Command("docker", "rm", containerName)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
@@ -47,8 +44,7 @@ func RemoveContainer(containerName string) error {
 	return err
 }
 
-// RemoveImage removes image with given name
-func RemoveImage(imageName string) error {
+func removeImage(imageName string) error {
 	cmd := exec.Command("docker", "image", "rm", imageName)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,

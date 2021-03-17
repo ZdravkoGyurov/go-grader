@@ -2,25 +2,32 @@ package random
 
 import (
 	"math/rand"
-	"strconv"
-	"strings"
 	"time"
+)
+
+var (
+	l   = []rune("abcdefghijklmnopqrstuvwxyz")
+	lun = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// String generates a random alphanumeric string
-func String() string {
-	return strconv.FormatInt(rand.Int63(), 36)
+// String generates a random lowercase string with given length
+func LowercaseString(length int) string {
+	return randomString(length, l)
 }
 
-// LongString generates a long random alphanumeric string
-func LongString() string {
-	var sb strings.Builder
-	for i := 0; i < 5; i++ {
-		sb.WriteString(String())
+// String generates a random alphanumeric string with given length
+func String(length int) string {
+	return randomString(length, lun)
+}
+
+func randomString(length int, src []rune) string {
+	r := make([]rune, length)
+	for i := range r {
+		r[i] = src[rand.Intn(len(src))]
 	}
-	return sb.String()
+	return string(r)
 }

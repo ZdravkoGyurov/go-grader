@@ -9,16 +9,12 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
 
-// StopFunc ...
-type StopFunc = func()
-
 type job struct {
 	id   string
 	name string
 	f    func()
 }
 
-// Executor ...
 type Executor struct {
 	wg      sync.WaitGroup
 	jobs    chan job
@@ -38,7 +34,6 @@ func New(cfg config.Config) *Executor {
 	return e
 }
 
-// Start ...
 func (e *Executor) Start() {
 	e.wg.Add(e.cfg.MaxExecutorWorkers)
 	for i := 0; i < e.cfg.MaxExecutorWorkers; i++ {
@@ -46,13 +41,12 @@ func (e *Executor) Start() {
 	}
 }
 
-// EnqueueJob ...
-func (e *Executor) EnqueueJob(name string, f func()) (id string, err error) {
+func (e *Executor) QueueJob(name string, f func()) (id string, err error) {
 	if e.stopped {
 		return "", errors.New("executor is stopped")
 	}
 
-	id = random.String()
+	id = random.String(10)
 	j := job{
 		id:   id,
 		name: name,

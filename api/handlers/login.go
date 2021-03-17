@@ -1,4 +1,4 @@
-package login
+package handlers
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
@@ -20,25 +19,15 @@ type loginStorage interface {
 	CreateSession(ctx context.Context, session *model.Session) error
 }
 
-// HTTPHandler ...
-type HTTPHandler struct {
+type loginHandler struct {
 	appContext app.Context
 	loginStorage
 }
 
-// NewHTTPHandler creates a new login http handler
-func NewHTTPHandler(appContext app.Context, loginStorage loginStorage) *HTTPHandler {
-	return &HTTPHandler{
-		appContext:   appContext,
-		loginStorage: loginStorage,
-	}
-}
-
-// Post ...
-func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *loginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	if account.UserLoggedIn(h.appContext, request) {
+	if _, err := request.Cookie(h.appContext.Cfg.SessionCookieName); err == nil {
 		log.Warning().Println(errors.New("failed to login logged in user"))
 		writer.WriteHeader(http.StatusOK)
 		return
@@ -65,7 +54,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	session := model.Session{
-		ID:     random.LongString(),
+		ID:     random.String(20),
 		UserID: user.ID,
 	}
 	err = h.loginStorage.CreateSession(ctx, &session)

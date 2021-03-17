@@ -15,14 +15,12 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/storage"
 )
 
-// Context ...
 type Context struct {
 	Context context.Context
 	Cancel  context.CancelFunc
 	Cfg     config.Config
 }
 
-// NewContext ...
 func NewContext() Context {
 	cfg := config.Config{
 		Host:                      "0.0.0.0",
@@ -50,7 +48,6 @@ func NewContext() Context {
 	}
 }
 
-// Application ...
 type Application struct {
 	appContext Context
 	exec       *executor.Executor
@@ -58,7 +55,6 @@ type Application struct {
 	server     *http.Server
 }
 
-// New ...
 func New(appContext Context, exec *executor.Executor, storage *storage.Storage, handler http.Handler) *Application {
 	address := fmt.Sprintf("%s:%d", appContext.Cfg.Host, appContext.Cfg.Port)
 	server := &http.Server{
@@ -76,7 +72,6 @@ func New(appContext Context, exec *executor.Executor, storage *storage.Storage, 
 	}
 }
 
-// Start ...
 func (a *Application) Start() {
 	a.setupSignalNotifier()
 
@@ -95,7 +90,6 @@ func (a *Application) Start() {
 	log.Info().Println("Application stopped gracefully")
 }
 
-// Stop ...
 func (a *Application) Stop() {
 	a.appContext.Cancel()
 }

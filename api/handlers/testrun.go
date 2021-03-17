@@ -1,11 +1,11 @@
-package testrun
+package handlers
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
-	"github.com/ZdravkoGyurov/go-grader/pkg/docker"
+	"github.com/ZdravkoGyurov/go-grader/pkg/dexec"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
@@ -13,40 +13,30 @@ import (
 type testRunDBHandler interface {
 }
 
-type executor interface {
-	EnqueueJob(name string, f func()) (id string, err error)
+type exe interface {
+	QueueJob(name string, f func()) (id string, err error)
 }
 
-// HTTPHandler ...
-type HTTPHandler struct {
+type testrunHandler struct {
 	appContext app.Context
-	executor
+	exe
 }
 
-// NewHTTPHandler creates a new test run http handler
-func NewHTTPHandler(appContext app.Context, executor executor) *HTTPHandler {
-	return &HTTPHandler{
-		appContext: appContext,
-		executor:   executor,
-	}
-}
-
-// Post ...
-func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *testrunHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	// ctx := request.Context()
 
 	jobName := "run tests in docker"
 	jobFunc := func() {
-		testsCfg := docker.ExecuteTestsConfig{
-			ImageName:       random.String(),
-			ContainerName:   random.String(),
+		testsCfg := dexec.TestsRunConfig{
+			ImageName:       random.LowercaseString(10),
+			ContainerName:   random.LowercaseString(10),
 			Assignment:      "assignment1",             // get from body
 			SolutionGitUser: "ZdravkoGyurov",           // get from db/user
 			SolutionGitRepo: "grader-docker-solutions", // get from db/course
 			TestsGitUser:    h.appContext.Cfg.TestsGitUser,
 			TestsGitRepo:    h.appContext.Cfg.TestsGitRepo,
 		}
-		output, err := docker.ExecuteTests(testsCfg)
+		output, err := dexec.RunTests(testsCfg)
 		if err != nil {
 			log.Error().Println(err) // log status in db
 			log.Error().Println(output)
@@ -54,7 +44,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		}
 		log.Info().Println(">>>", output) // log status in db
 	}
-	jobID, err := h.executor.EnqueueJob(jobName, jobFunc)
+	jobID, err := h.exe.QueueJob(jobName, jobFunc)
 	if err != nil {
 		log.Error().Printf("failed to run job '%s': %s", jobName, err)
 		writer.WriteHeader(http.StatusBadRequest)

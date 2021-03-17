@@ -1,4 +1,4 @@
-package logout
+package handlers
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
@@ -15,25 +14,15 @@ type logoutStorage interface {
 	DeleteSession(ctx context.Context, sessionID string) error
 }
 
-// HTTPHandler ...
-type HTTPHandler struct {
+type logoutHandler struct {
 	appContext app.Context
 	logoutStorage
 }
 
-// NewHTTPHandler creates a new logout http handler
-func NewHTTPHandler(appContext app.Context, logoutStorage logoutStorage) *HTTPHandler {
-	return &HTTPHandler{
-		appContext:    appContext,
-		logoutStorage: logoutStorage,
-	}
-}
-
-// Post ...
-func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *logoutHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	if !account.UserLoggedIn(h.appContext, request) {
+	if _, err := request.Cookie(h.appContext.Cfg.SessionCookieName); err != nil {
 		log.Warning().Println(errors.New("failed to logout logged out user"))
 		writer.WriteHeader(http.StatusOK)
 		return

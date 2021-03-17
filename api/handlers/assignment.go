@@ -1,4 +1,4 @@
-package assignment
+package handlers
 
 import (
 	"context"
@@ -20,20 +20,11 @@ type assignmentStorage interface {
 	DeleteAssignment(ctx context.Context, assignmentID string) error
 }
 
-// HTTPHandler ...
-type HTTPHandler struct {
+type assignmentHandler struct {
 	assignmentStorage assignmentStorage
 }
 
-// NewHTTPHandler creates a new assignment http handler
-func NewHTTPHandler(assignmentStorage assignmentStorage) *HTTPHandler {
-	return &HTTPHandler{
-		assignmentStorage: assignmentStorage,
-	}
-}
-
-// Post ...
-func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *assignmentHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	var assignment model.Assignment
@@ -56,8 +47,7 @@ func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 }
 
-// Get ...
-func (h *HTTPHandler) Get(writer http.ResponseWriter, request *http.Request) {
+func (h *assignmentHandler) Get(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -86,8 +76,7 @@ func (h *HTTPHandler) Get(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(responseJSON)
 }
 
-// Patch ...
-func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
+func (h *assignmentHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -126,8 +115,7 @@ func (h *HTTPHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(responseJSON)
 }
 
-// Delete ...
-func (h *HTTPHandler) Delete(writer http.ResponseWriter, request *http.Request) {
+func (h *assignmentHandler) Delete(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]

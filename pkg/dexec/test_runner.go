@@ -1,4 +1,4 @@
-package docker
+package dexec
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
-type ExecuteTestsConfig struct {
+type TestsRunConfig struct {
 	ImageName       string
 	ContainerName   string
 	Assignment      string
@@ -16,15 +16,14 @@ type ExecuteTestsConfig struct {
 	TestsGitRepo    string
 }
 
-// ExecuteTests ...
-func ExecuteTests(testsCfg ExecuteTestsConfig) (string, error) {
-	output, err := BuildAssignmentImage(testsCfg, "pkg/docker/.")
+func RunTests(testsCfg TestsRunConfig) (string, error) {
+	output, err := buildAssignmentImage(testsCfg, "pkg/docker/.")
 	if err != nil {
 		return output, fmt.Errorf("failed docker build: %w", err)
 	}
 	defer handleRemoveImage(testsCfg.ImageName)
 
-	output, err = RunImage(testsCfg.ImageName, testsCfg.ContainerName)
+	output, err = runImage(testsCfg.ImageName, testsCfg.ContainerName)
 	if err != nil && false { // TODO: check additionally if error was from test fail
 		return output, fmt.Errorf("failed docker run: %w", err)
 	}
@@ -34,13 +33,13 @@ func ExecuteTests(testsCfg ExecuteTestsConfig) (string, error) {
 }
 
 func handleRemoveImage(imageName string) {
-	if err := RemoveImage(imageName); err != nil {
+	if err := removeImage(imageName); err != nil {
 		log.Error().Printf("failed docker image rm: %s", err)
 	}
 }
 
 func handleRemoveContainer(containerName string) {
-	if err := RemoveContainer(containerName); err != nil {
+	if err := removeContainer(containerName); err != nil {
 		log.Error().Printf("failed docker rm: %s", err)
 	}
 }

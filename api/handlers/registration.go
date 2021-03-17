@@ -1,4 +1,4 @@
-package registration
+package handlers
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/ZdravkoGyurov/go-grader/api/handlers/account"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
@@ -18,25 +17,15 @@ type registrationStorage interface {
 	CreateUser(ctx context.Context, user *model.User) error
 }
 
-// HTTPHandler ...
-type HTTPHandler struct {
+type registrationHandler struct {
 	appContext app.Context
 	registrationStorage
 }
 
-// NewHTTPHandler creates a new registration http handler
-func NewHTTPHandler(appContext app.Context, registrationStorage registrationStorage) *HTTPHandler {
-	return &HTTPHandler{
-		appContext:          appContext,
-		registrationStorage: registrationStorage,
-	}
-}
-
-// Post ...
-func (h *HTTPHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *registrationHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	if account.UserLoggedIn(h.appContext, request) {
+	if _, err := request.Cookie(h.appContext.Cfg.SessionCookieName); err == nil {
 		log.Error().Println(errors.New("failed to register logged in user"))
 		writer.WriteHeader(http.StatusUnprocessableEntity)
 		return
