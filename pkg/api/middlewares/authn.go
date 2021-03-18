@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/ZdravkoGyurov/go-grader/api/req"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/req"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"

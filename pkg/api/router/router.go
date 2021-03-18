@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/ZdravkoGyurov/go-grader/api/handlers"
-	"github.com/ZdravkoGyurov/go-grader/api/middlewares"
-	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/handlers"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/middlewares"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 )
 

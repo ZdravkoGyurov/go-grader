@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/ZdravkoGyurov/go-grader/api/handlers"
-	"github.com/ZdravkoGyurov/go-grader/api/middlewares"
-	"github.com/ZdravkoGyurov/go-grader/api/router"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/handlers"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/middlewares"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/router"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
+	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 	"github.com/ZdravkoGyurov/go-grader/pkg/executor"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/storage"
@@ -23,7 +24,13 @@ func main() {
 	exe.Start()
 	log.Info().Println("Started job executor...")
 
-	httpHandlers := handlers.NewHandlers(appContext, storage, exe)
+	ctrl := &controller.Controller{
+		Storage:  storage,
+		Executor: exe,
+		Config:   appContext.Cfg,
+	}
+
+	httpHandlers := handlers.NewHandlers(appContext, ctrl)
 	httpMiddlewares := middlewares.NewMiddlewares(appContext, storage)
 	httpRouter := router.New(appContext, httpHandlers, httpMiddlewares)
 

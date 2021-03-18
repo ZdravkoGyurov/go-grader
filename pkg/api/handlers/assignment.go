@@ -1,30 +1,22 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 
-	"github.com/ZdravkoGyurov/go-grader/api/router/paths"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
+	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
-type assignmentStorage interface {
-	CreateAssignment(ctx context.Context, assignment *model.Assignment) error
-	ReadAssignment(ctx context.Context, assignmentID string) (*model.Assignment, error)
-	UpdateAssignment(ctx context.Context, assignmentID string, assignment *model.Assignment) (*model.Assignment, error)
-	DeleteAssignment(ctx context.Context, assignmentID string) error
+type AssignmentHandler struct {
+	Controller *controller.Controller
 }
 
-type assignmentHandler struct {
-	assignmentStorage assignmentStorage
-}
-
-func (h *assignmentHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *AssignmentHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	var assignment model.Assignment
@@ -34,11 +26,10 @@ func (h *assignmentHandler) Post(writer http.ResponseWriter, request *http.Reque
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	assignment.ID = uuid.NewString()
 
-	if err := h.assignmentStorage.CreateAssignment(ctx, &assignment); err != nil {
-		log.Error().Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
+	if err := h.Controller.CreateAssignment(ctx, &assignment); err != nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusInternalServerError) // handle error method
 		return
 	}
 
@@ -47,7 +38,7 @@ func (h *assignmentHandler) Post(writer http.ResponseWriter, request *http.Reque
 	writer.WriteHeader(http.StatusOK)
 }
 
-func (h *assignmentHandler) Get(writer http.ResponseWriter, request *http.Request) {
+func (h *AssignmentHandler) Get(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -57,10 +48,10 @@ func (h *assignmentHandler) Get(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	assignment, err := h.assignmentStorage.ReadAssignment(ctx, assignmentID)
+	assignment, err := h.Controller.GetAssignment(ctx, assignmentID)
 	if err != nil {
-		log.Error().Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusInternalServerError) // handle error method
 		return
 	}
 
@@ -76,7 +67,7 @@ func (h *assignmentHandler) Get(writer http.ResponseWriter, request *http.Reques
 	writer.Write(responseJSON)
 }
 
-func (h *assignmentHandler) Patch(writer http.ResponseWriter, request *http.Request) {
+func (h *AssignmentHandler) Patch(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -95,9 +86,9 @@ func (h *assignmentHandler) Patch(writer http.ResponseWriter, request *http.Requ
 	}
 	updateAssignment.ID = ""
 
-	updatedAssignment, err := h.assignmentStorage.UpdateAssignment(ctx, assignmentID, &updateAssignment)
+	updatedAssignment, err := h.Controller.UpdateAssignment(ctx, assignmentID, &updateAssignment)
 	if err != nil {
-		log.Error().Println(err)
+		log.Error().Printf("failed to marshal assignment json data: %s", err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -115,7 +106,7 @@ func (h *assignmentHandler) Patch(writer http.ResponseWriter, request *http.Requ
 	writer.Write(responseJSON)
 }
 
-func (h *assignmentHandler) Delete(writer http.ResponseWriter, request *http.Request) {
+func (h *AssignmentHandler) Delete(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -125,9 +116,9 @@ func (h *assignmentHandler) Delete(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	if err := h.assignmentStorage.DeleteAssignment(ctx, assignmentID); err != nil {
-		log.Error().Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
+	if err := h.Controller.DeleteAssignment(ctx, assignmentID); err != nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusInternalServerError) // handle error method
 		return
 	}
 

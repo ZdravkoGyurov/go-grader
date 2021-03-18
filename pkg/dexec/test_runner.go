@@ -17,7 +17,7 @@ type TestsRunConfig struct {
 }
 
 func RunTests(testsCfg TestsRunConfig) (string, error) {
-	output, err := buildAssignmentImage(testsCfg, "pkg/docker/.")
+	output, err := buildAssignmentImage(testsCfg, "pkg/dexec/.")
 	if err != nil {
 		return output, fmt.Errorf("failed docker build: %w", err)
 	}
