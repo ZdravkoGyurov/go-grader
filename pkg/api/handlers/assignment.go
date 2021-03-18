@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
@@ -22,14 +25,13 @@ func (h *AssignmentHandler) Post(writer http.ResponseWriter, request *http.Reque
 	var assignment model.Assignment
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&assignment); err != nil {
-		log.Error().Printf("failed to decode assignment from request body: %s", err)
-		writer.WriteHeader(http.StatusBadRequest)
+		err = fmt.Errorf("failed to decode assignment from request body: %s", err)
+		response.Send(writer, http.StatusBadRequest, nil, err)
 		return
 	}
 
 	if err := h.Controller.CreateAssignment(ctx, &assignment); err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError) // handle error method
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
@@ -43,28 +45,18 @@ func (h *AssignmentHandler) Get(writer http.ResponseWriter, request *http.Reques
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
 	if !ok {
-		log.Error().Println("failed to get assignment id path parameter")
-		writer.WriteHeader(http.StatusInternalServerError)
+		err := errors.New("failed to get assignment id path parameter")
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
 	assignment, err := h.Controller.GetAssignment(ctx, assignmentID)
 	if err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError) // handle error method
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
-	responseJSON, err := json.Marshal(assignment)
-	if err != nil {
-		log.Error().Printf("failed to marshal assignment json data: %s", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(responseJSON)
+	response.Send(writer, http.StatusOK, assignment, nil)
 }
 
 func (h *AssignmentHandler) Patch(writer http.ResponseWriter, request *http.Request) {

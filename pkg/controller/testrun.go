@@ -26,7 +26,7 @@ func (c *Controller) CreateTestrun() (string, error) {
 		}
 		log.Info().Println(">>>", output) // log status in db
 	}
-	jobID, err := c.Executor.QueueJob(jobName, jobFunc)
+	jobID, err := c.executor.QueueJob(jobName, jobFunc)
 	if err != nil {
 		return "", err
 	}

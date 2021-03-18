@@ -8,6 +8,14 @@ import (
 
 type Controller struct {
 	Config   config.Config
-	Storage  *storage.Storage
-	Executor *executor.Executor
+	storage  *storage.Storage
+	executor *executor.Executor
+}
+
+func New(cfg config.Config, storage *storage.Storage, executor *executor.Executor) *Controller {
+	return &Controller{
+		Config:   cfg,
+		storage:  storage,
+		executor: executor,
+	}
 }

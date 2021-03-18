@@ -24,11 +24,7 @@ func main() {
 	exe.Start()
 	log.Info().Println("Started job executor...")
 
-	ctrl := &controller.Controller{
-		Storage:  storage,
-		Executor: exe,
-		Config:   appContext.Cfg,
-	}
+	ctrl := controller.New(appContext.Cfg, storage, exe)
 
 	httpHandlers := handlers.NewHandlers(appContext, ctrl)
 	httpMiddlewares := middlewares.NewMiddlewares(appContext, storage)

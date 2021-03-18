@@ -10,7 +10,7 @@ import (
 func (c *Controller) CreateAssignment(ctx context.Context, assignment *model.Assignment) error {
 	assignment.ID = uuid.NewString()
 
-	if err := c.Storage.CreateAssignment(ctx, assignment); err != nil {
+	if err := c.storage.CreateAssignment(ctx, assignment); err != nil {
 		return err
 	}
 
@@ -18,7 +18,7 @@ func (c *Controller) CreateAssignment(ctx context.Context, assignment *model.Ass
 }
 
 func (c *Controller) GetAssignment(ctx context.Context, assignmentID string) (*model.Assignment, error) {
-	assignment, err := c.Storage.ReadAssignment(ctx, assignmentID)
+	assignment, err := c.storage.ReadAssignment(ctx, assignmentID)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (c *Controller) GetAssignment(ctx context.Context, assignmentID string) (*m
 }
 
 func (c *Controller) UpdateAssignment(ctx context.Context, assignmentID string, assignment *model.Assignment) (*model.Assignment, error) {
-	updatedAssignment, err := c.Storage.UpdateAssignment(ctx, assignmentID, assignment)
+	updatedAssignment, err := c.storage.UpdateAssignment(ctx, assignmentID, assignment)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (c *Controller) UpdateAssignment(ctx context.Context, assignmentID string, 
 }
 
 func (c *Controller) DeleteAssignment(ctx context.Context, assignmentID string) error {
-	if err := c.Storage.DeleteAssignment(ctx, assignmentID); err != nil {
+	if err := c.storage.DeleteAssignment(ctx, assignmentID); err != nil {
 		return err
 	}
 

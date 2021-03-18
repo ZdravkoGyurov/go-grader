@@ -24,7 +24,7 @@ func (c *Controller) Register(ctx context.Context, username, password string) er
 		Disabled:    false,
 	}
 
-	if err := c.Storage.CreateUser(ctx, &user); err != nil {
+	if err := c.storage.CreateUser(ctx, &user); err != nil {
 		return err
 	}
 

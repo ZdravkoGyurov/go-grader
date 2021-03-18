@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Controller) Login(ctx context.Context, username, password string) (string, error) {
-	user, err := c.Storage.ReadUserByUsername(ctx, username)
+	user, err := c.storage.ReadUserByUsername(ctx, username)
 	if err != nil {
 		return "", err
 	}
@@ -24,7 +24,7 @@ func (c *Controller) Login(ctx context.Context, username, password string) (stri
 		UserID: user.ID,
 	}
 
-	err = c.Storage.CreateSession(ctx, &session)
+	err = c.storage.CreateSession(ctx, &session)
 	if err != nil {
 		return "", err
 	}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/req"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
@@ -33,8 +34,7 @@ func (m authnMiddleware) authenticate(next http.Handler) http.Handler {
 		sessionID := cookie.Value
 		session, err := m.authnStorage.ReadSession(ctx, sessionID)
 		if err != nil {
-			log.Error().Println(err)
-			writer.WriteHeader(http.StatusInternalServerError)
+			response.Send(writer, http.StatusInternalServerError, nil, err)
 			return
 		}
 
