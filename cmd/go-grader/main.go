@@ -26,7 +26,7 @@ func main() {
 	ctrl := controller.New(appContext.Cfg, storage, exe)
 
 	httpMiddlewares := middlewares.NewMiddlewares(appContext, storage)
-	httpRouter := router.New(appContext, ctrl, httpMiddlewares)
+	httpRouter := router.New(ctrl, httpMiddlewares)
 
 	app := app.New(appContext, exe, storage, httpRouter)
 

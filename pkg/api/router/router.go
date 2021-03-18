@@ -8,12 +8,11 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/handlers"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/middlewares"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
-	"github.com/ZdravkoGyurov/go-grader/pkg/app"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 )
 
 // New creates a mux router with configured routes
-func New(appContext app.Context, ctrl *controller.Controller, mws *middlewares.Middlewares) *mux.Router {
+func New(ctrl *controller.Controller, mws *middlewares.Middlewares) *mux.Router {
 	r := mux.NewRouter()
 	r.Use(middlewares.PanicRecovery)
 	setupAccountRoutes(r, ctrl)
