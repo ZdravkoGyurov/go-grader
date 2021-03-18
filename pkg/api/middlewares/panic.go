@@ -1,9 +1,10 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 )
 
 func PanicRecovery(next http.Handler) http.Handler {
@@ -12,9 +13,7 @@ func PanicRecovery(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				log.Error().Printf("recovered from panic: %s", err)
-				writer.Header().Set("Content-Type", "application/json")
-				writer.WriteHeader(http.StatusInternalServerError)
+				response.Send(writer, http.StatusInternalServerError, nil, fmt.Errorf("recovered from panic: %s", err))
 			}
 		}()
 

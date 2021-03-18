@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 )
 
@@ -14,13 +14,11 @@ type TestrunHandler struct {
 func (h *TestrunHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	// ctx := request.Context()
 
-	jobID, err := h.Controller.CreateTestrun()
+	_, err := h.Controller.CreateTestrun()
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write([]byte(fmt.Sprintf(`{"jobId": %s}`, jobID)))
+	response.Send(writer, http.StatusOK, struct{}{}, nil)
 }

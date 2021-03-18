@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/req"
-	"github.com/ZdravkoGyurov/go-grader/pkg/log"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 )
 
 const (
@@ -26,16 +26,16 @@ func (m AuthzMiddleware) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		userPermissions, ok := req.GetPermissions(request)
 		if !ok {
-			log.Error().Println(errors.New("failed to get user from request context values"))
-			writer.WriteHeader(http.StatusInternalServerError)
+			err := errors.New("failed to get user from request context values")
+			response.Send(writer, http.StatusInternalServerError, nil, err)
 			return
 		}
 
 		userPermMap := permissionsMap(userPermissions...)
 		for _, perm := range m.RequiredPermissions {
 			if _, ok := userPermMap[perm]; !ok {
-				log.Error().Println(fmt.Errorf("failed to authorize user, missing %s permission", perm))
-				writer.WriteHeader(http.StatusForbidden)
+				err := fmt.Errorf("failed to authorize user, missing %s permission", perm)
+				response.Send(writer, http.StatusForbidden, nil, err)
 				return
 			}
 		}

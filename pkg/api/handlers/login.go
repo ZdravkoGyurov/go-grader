@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
-	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
 type LoginHandler struct {
@@ -18,22 +17,20 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	if _, err := request.Cookie(h.Controller.Config.SessionCookieName); err == nil {
-		log.Warning().Println(errors.New("failed to login logged in user"))
-		writer.WriteHeader(http.StatusOK)
+		response.Send(writer, http.StatusOK, struct{}{}, nil)
 		return
 	}
 
 	username, password, ok := request.BasicAuth()
 	if !ok {
-		log.Error().Println("failed to get username and password from authorization header")
-		writer.WriteHeader(http.StatusBadRequest)
+		err := errors.New("failed to get username and password from authorization header")
+		response.Send(writer, http.StatusBadRequest, nil, err)
 		return
 	}
 
 	sessionID, err := h.Controller.Login(ctx, username, password)
 	if err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError) // handle error method
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
@@ -49,8 +46,6 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 	}
 	http.SetCookie(writer, cookie)
-	fmt.Printf("created cookie: %+v\n", *cookie)
 
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
+	response.Send(writer, http.StatusOK, struct{}{}, nil)
 }

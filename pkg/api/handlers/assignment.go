@@ -36,8 +36,7 @@ func (h *AssignmentHandler) Post(writer http.ResponseWriter, request *http.Reque
 	}
 
 	log.Info().Printf("created assignment with id %s\n", assignment.ID)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
+	response.Send(writer, http.StatusOK, assignment, nil)
 }
 
 func (h *AssignmentHandler) Get(writer http.ResponseWriter, request *http.Request) {
@@ -64,38 +63,29 @@ func (h *AssignmentHandler) Patch(writer http.ResponseWriter, request *http.Requ
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
 	if !ok {
-		log.Error().Println("failed to get assignment id path parameter")
-		writer.WriteHeader(http.StatusInternalServerError)
+		err := errors.New("failed to get assignment id path parameter")
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
 	var updateAssignment model.Assignment
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&updateAssignment); err != nil {
-		log.Error().Printf("failed to decode assignment from request body: %s", err)
-		writer.WriteHeader(http.StatusBadRequest)
+		err = fmt.Errorf("failed to decode assignment from request body: %s", err)
+		response.Send(writer, http.StatusBadRequest, nil, err)
 		return
 	}
 	updateAssignment.ID = ""
 
 	updatedAssignment, err := h.Controller.UpdateAssignment(ctx, assignmentID, &updateAssignment)
 	if err != nil {
-		log.Error().Printf("failed to marshal assignment json data: %s", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	responseJSON, err := json.Marshal(updatedAssignment)
-	if err != nil {
-		log.Error().Printf("failed to marshal assignment json data: %s", err)
-		writer.WriteHeader(http.StatusInternalServerError)
+		err = fmt.Errorf("failed to marshal assignment json data: %s", err)
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
 	log.Info().Printf("updated assignment with id %s\n", assignmentID)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(responseJSON)
+	response.Send(writer, http.StatusOK, updatedAssignment, nil)
 }
 
 func (h *AssignmentHandler) Delete(writer http.ResponseWriter, request *http.Request) {
@@ -103,18 +93,16 @@ func (h *AssignmentHandler) Delete(writer http.ResponseWriter, request *http.Req
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
 	if !ok {
-		log.Error().Println("failed to get assignment id path parameter")
-		writer.WriteHeader(http.StatusInternalServerError)
+		err := errors.New("failed to get assignment id path parameter")
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
 	if err := h.Controller.DeleteAssignment(ctx, assignmentID); err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError) // handle error method
+		response.Send(writer, http.StatusInternalServerError, nil, err)
 		return
 	}
 
 	log.Info().Printf("deleted assignment with id %s\n", assignmentID)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusNoContent)
+	response.Send(writer, http.StatusNoContent, struct{}{}, nil)
 }
