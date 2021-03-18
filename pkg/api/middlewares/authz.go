@@ -27,7 +27,7 @@ func (m AuthzMiddleware) Authorize(next http.Handler) http.Handler {
 		userPermissions, ok := req.GetPermissions(request)
 		if !ok {
 			err := errors.New("failed to get user from request context values")
-			response.Send(writer, http.StatusInternalServerError, nil, err)
+			response.SendError(writer, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -35,7 +35,7 @@ func (m AuthzMiddleware) Authorize(next http.Handler) http.Handler {
 		for _, perm := range m.RequiredPermissions {
 			if _, ok := userPermMap[perm]; !ok {
 				err := fmt.Errorf("failed to authorize user, missing %s permission", perm)
-				response.Send(writer, http.StatusForbidden, nil, err)
+				response.SendError(writer, http.StatusForbidden, err)
 				return
 			}
 		}

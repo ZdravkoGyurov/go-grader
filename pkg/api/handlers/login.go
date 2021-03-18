@@ -17,20 +17,20 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	if _, err := request.Cookie(h.Controller.Config.SessionCookieName); err == nil {
-		response.Send(writer, http.StatusOK, struct{}{}, nil)
+		response.SendData(writer, http.StatusOK, struct{}{})
 		return
 	}
 
 	username, password, ok := request.BasicAuth()
 	if !ok {
 		err := errors.New("failed to get username and password from authorization header")
-		response.Send(writer, http.StatusBadRequest, nil, err)
+		response.SendError(writer, http.StatusBadRequest, err)
 		return
 	}
 
 	sessionID, err := h.Controller.Login(ctx, username, password)
 	if err != nil {
-		response.Send(writer, http.StatusInternalServerError, nil, err)
+		response.SendError(writer, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -47,5 +47,5 @@ func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
 	}
 	http.SetCookie(writer, cookie)
 
-	response.Send(writer, http.StatusOK, struct{}{}, nil)
+	response.SendData(writer, http.StatusOK, struct{}{})
 }

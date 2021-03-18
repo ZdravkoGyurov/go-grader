@@ -13,7 +13,7 @@ func PanicRecovery(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				response.Send(writer, http.StatusInternalServerError, nil, fmt.Errorf("recovered from panic: %s", err))
+				response.SendError(writer, http.StatusInternalServerError, fmt.Errorf("recovered from panic: %s", err))
 			}
 		}()
 

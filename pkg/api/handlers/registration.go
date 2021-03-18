@@ -17,21 +17,21 @@ func (h *RegistrationHandler) Post(writer http.ResponseWriter, request *http.Req
 
 	if _, err := request.Cookie(h.Controller.Config.SessionCookieName); err == nil {
 		err := errors.New("failed to register logged in user")
-		response.Send(writer, http.StatusUnprocessableEntity, nil, err)
+		response.SendError(writer, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	username, password, ok := request.BasicAuth()
 	if !ok {
 		err := errors.New("failed to get username and password from authorization header")
-		response.Send(writer, http.StatusBadRequest, nil, err)
+		response.SendError(writer, http.StatusBadRequest, err)
 		return
 	}
 
 	if err := h.Controller.Register(ctx, username, password); err != nil {
-		response.Send(writer, http.StatusInternalServerError, nil, err)
+		response.SendError(writer, http.StatusInternalServerError, err)
 		return
 	}
 
-	response.Send(writer, http.StatusOK, struct{}{}, nil)
+	response.SendData(writer, http.StatusOK, struct{}{})
 }

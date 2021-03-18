@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/ZdravkoGyurov/go-grader/pkg/api/handlers"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/middlewares"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/router"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app"
@@ -26,9 +25,8 @@ func main() {
 
 	ctrl := controller.New(appContext.Cfg, storage, exe)
 
-	httpHandlers := handlers.NewHandlers(appContext, ctrl)
 	httpMiddlewares := middlewares.NewMiddlewares(appContext, storage)
-	httpRouter := router.New(appContext, httpHandlers, httpMiddlewares)
+	httpRouter := router.New(appContext, ctrl, httpMiddlewares)
 
 	app := app.New(appContext, exe, storage, httpRouter)
 

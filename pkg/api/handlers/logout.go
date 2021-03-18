@@ -18,13 +18,13 @@ func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) 
 
 	cookie, err := request.Cookie(h.Controller.Config.SessionCookieName)
 	if err != nil {
-		response.Send(writer, http.StatusOK, struct{}{}, nil)
+		response.SendData(writer, http.StatusOK, struct{}{})
 		return
 	}
 
 	sessionID := cookie.Value
 	if err = h.Controller.Logout(ctx, sessionID); err != nil {
-		response.Send(writer, http.StatusInternalServerError, nil, err)
+		response.SendError(writer, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -35,5 +35,5 @@ func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) 
 	http.SetCookie(writer, &expiredCookie)
 
 	log.Info().Printf("logged out user with session id %s\n", sessionID)
-	response.Send(writer, http.StatusOK, struct{}{}, nil)
+	response.SendData(writer, http.StatusOK, struct{}{})
 }

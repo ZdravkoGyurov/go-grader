@@ -25,20 +25,20 @@ func (m authnMiddleware) authenticate(next http.Handler) http.Handler {
 		ctx := request.Context()
 		cookie, err := request.Cookie(m.appContext.Cfg.SessionCookieName)
 		if err != nil {
-			response.Send(writer, http.StatusUnauthorized, nil, err)
+			response.SendError(writer, http.StatusUnauthorized, err)
 			return
 		}
 
 		sessionID := cookie.Value
 		session, err := m.authnStorage.ReadSession(ctx, sessionID)
 		if err != nil {
-			response.Send(writer, http.StatusInternalServerError, nil, err)
+			response.SendError(writer, http.StatusInternalServerError, err)
 			return
 		}
 
 		user, err := m.authnStorage.ReadUserByID(ctx, session.UserID)
 		if err != nil {
-			response.Send(writer, http.StatusInternalServerError, nil, err)
+			response.SendError(writer, http.StatusInternalServerError, err)
 			return
 		}
 

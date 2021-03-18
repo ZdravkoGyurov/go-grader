@@ -8,25 +8,29 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
-func Send(writer http.ResponseWriter, status int, data interface{}, err error) {
-	if err != nil {
-		if status == http.StatusInternalServerError {
-			respondInternalError(writer)
-		} else {
-			respondError(writer, status, err.Error())
-		}
-		log.Error().Println(err)
-		return
-	}
-
+func SendData(writer http.ResponseWriter, status int, data interface{}) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		respondInternalError(writer)
 		log.Error().Printf("failed to marshal response %+v", data)
 		return
 	}
-
 	respond(writer, status, jsonBytes)
+}
+
+func SendError(writer http.ResponseWriter, status int, err error) {
+	if err != nil {
+		respondInternalError(writer)
+		log.Error().Println("failed to return nil error")
+		return
+	}
+	if status == http.StatusInternalServerError {
+		respondInternalError(writer)
+	} else {
+		respondError(writer, status, err.Error())
+	}
+	log.Error().Println(err)
+	return
 }
 
 func respondInternalError(writer http.ResponseWriter) {

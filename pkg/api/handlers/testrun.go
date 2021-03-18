@@ -16,9 +16,9 @@ func (h *TestrunHandler) Post(writer http.ResponseWriter, request *http.Request)
 
 	_, err := h.Controller.CreateTestrun()
 	if err != nil {
-		response.Send(writer, http.StatusInternalServerError, nil, err)
+		response.SendError(writer, http.StatusInternalServerError, err)
 		return
 	}
 
-	response.Send(writer, http.StatusOK, struct{}{}, nil)
+	response.SendData(writer, http.StatusOK, struct{}{})
 }
