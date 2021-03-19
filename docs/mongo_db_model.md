@@ -3,6 +3,9 @@
 ### Session
 - ID     string
 - UserID string
+  - CreateSession(...)
+  - ReadSession(sessionID string)
+  - DeleteSession(sessionID string)
 
 ### User
 - ID             string
