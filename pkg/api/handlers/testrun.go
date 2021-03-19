@@ -7,11 +7,11 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 )
 
-type TestrunHandler struct {
+type Testrun struct {
 	Controller *controller.Controller
 }
 
-func (h *TestrunHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *Testrun) Post(writer http.ResponseWriter, request *http.Request) {
 	// ctx := request.Context()
 
 	_, err := h.Controller.CreateTestrun()

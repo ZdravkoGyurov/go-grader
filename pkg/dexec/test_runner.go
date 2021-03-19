@@ -16,18 +16,18 @@ type TestsRunConfig struct {
 	TestsGitRepo    string
 }
 
-func RunTests(testsCfg TestsRunConfig) (string, error) {
-	output, err := buildAssignmentImage(testsCfg, "pkg/dexec/.")
+func RunTests(testsConfig TestsRunConfig) (string, error) {
+	output, err := buildAssignmentImage(testsConfig, "pkg/dexec/.")
 	if err != nil {
 		return output, fmt.Errorf("failed docker build: %w", err)
 	}
-	defer handleRemoveImage(testsCfg.ImageName)
+	defer handleRemoveImage(testsConfig.ImageName)
 
-	output, err = runImage(testsCfg.ImageName, testsCfg.ContainerName)
+	output, err = runImage(testsConfig.ImageName, testsConfig.ContainerName)
 	if err != nil && false { // TODO: check additionally if error was from test fail
 		return output, fmt.Errorf("failed docker run: %w", err)
 	}
-	defer handleRemoveContainer(testsCfg.ContainerName)
+	defer handleRemoveContainer(testsConfig.ContainerName)
 
 	return output, nil
 }

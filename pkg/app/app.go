@@ -7,9 +7,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/router"
 	"github.com/ZdravkoGyurov/go-grader/pkg/app/config"
+	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 	"github.com/ZdravkoGyurov/go-grader/pkg/executor"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/storage"
@@ -18,33 +19,15 @@ import (
 type Context struct {
 	Context context.Context
 	Cancel  context.CancelFunc
-	Cfg     config.Config
+	Config  config.Config
 }
 
 func NewContext() Context {
-	cfg := config.Config{
-		Host:                      "0.0.0.0",
-		Port:                      8080,
-		ServerReadTimeout:         30 * time.Second,
-		ServerWriteTimeout:        30 * time.Second,
-		MaxExecutorWorkers:        5,
-		MaxExecutorConcurrentJobs: 100,
-		DatabaseURI:               "mongodb://host.docker.internal:27017",
-		DBConnectTimeout:          30 * time.Second,
-		DBDisconnectTimeout:       30 * time.Second,
-		DatabaseName:              "grader",
-		ServerShutdownTimeout:     5 * time.Second,
-		SessionCookieName:         "Grader",
-		TestsGitUser:              "ZdravkoGyurov",
-		TestsGitRepo:              "grader-docker-tests",
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
-
 	return Context{
 		Context: ctx,
 		Cancel:  cancel,
-		Cfg:     cfg,
+		Config:  config.DefaultConfig(),
 	}
 }
 
@@ -55,13 +38,27 @@ type Application struct {
 	server     *http.Server
 }
 
-func New(appContext Context, exe *executor.Executor, storage *storage.Storage, handler http.Handler) *Application {
-	address := fmt.Sprintf("%s:%d", appContext.Cfg.Host, appContext.Cfg.Port)
+func New() *Application {
+	appContext := NewContext()
+
+	storage, err := storage.New(appContext.Context, appContext.Config)
+	if err != nil {
+		log.Error().Fatalf("failed to connect to mongodb: %s", err)
+	}
+	log.Info().Println("connected to mongodb...")
+
+	exe := executor.New(appContext.Config)
+	exe.Start()
+	log.Info().Println("started job executor...")
+
+	ctrl := controller.New(appContext.Config, storage, exe)
+	httpRouter := router.New(ctrl)
+
 	server := &http.Server{
-		Addr:         address,
-		Handler:      handler,
-		ReadTimeout:  appContext.Cfg.ServerReadTimeout,
-		WriteTimeout: appContext.Cfg.ServerWriteTimeout,
+		Addr:         fmt.Sprintf("%s:%d", appContext.Config.Host, appContext.Config.Port),
+		Handler:      httpRouter,
+		ReadTimeout:  appContext.Config.ServerReadTimeout,
+		WriteTimeout: appContext.Config.ServerWriteTimeout,
 	}
 
 	return &Application{
@@ -80,7 +77,7 @@ func (a *Application) Start() {
 			log.Error().Fatalf("failed listen and serve: %s\n", err)
 		}
 	}()
-	log.Info().Println("Application started...")
+	log.Info().Println("application started...")
 
 	<-a.appContext.Context.Done()
 
@@ -115,7 +112,7 @@ func (a *Application) disconnectFromDB() {
 }
 
 func (a *Application) shutdownServer() {
-	ctx, cancel := context.WithTimeout(context.Background(), a.appContext.Cfg.ServerShutdownTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), a.appContext.Config.ServerShutdownTimeout)
 	defer cancel()
 	if err := a.server.Shutdown(ctx); err != nil {
 		log.Error().Fatalf("failed to shutdown http server: %s\n", err)

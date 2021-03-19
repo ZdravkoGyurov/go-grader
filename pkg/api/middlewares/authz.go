@@ -18,11 +18,11 @@ const (
 	CreateTestRunPermission = "CREATE_TESTRUN"
 )
 
-type AuthzMiddleware struct {
+type Authorization struct {
 	RequiredPermissions []string
 }
 
-func (m AuthzMiddleware) Authorize(next http.Handler) http.Handler {
+func (m Authorization) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		userPermissions, ok := req.GetPermissions(request)
 		if !ok {

@@ -12,53 +12,52 @@ import (
 )
 
 // New creates a mux router with configured routes
-func New(ctrl *controller.Controller, mws *middlewares.Middlewares) *mux.Router {
+func New(ctrl *controller.Controller) *mux.Router {
 	r := mux.NewRouter()
 	r.Use(middlewares.PanicRecovery)
 	setupAccountRoutes(r, ctrl)
-	setupAssignmentRoutes(r, ctrl, mws)
-	setupTestRunRoutes(r, ctrl, mws)
+	setupAssignmentRoutes(r, ctrl)
+	setupTestRunRoutes(r, ctrl)
 	return r
 }
 
 func setupAccountRoutes(r *mux.Router, ctrl *controller.Controller) {
-	registrationHandler := &handlers.RegistrationHandler{Controller: ctrl}
+	registrationHandler := &handlers.Registration{Controller: ctrl}
 	r.HandleFunc(paths.Register, registrationHandler.Post).Methods(http.MethodPost)
 
-	loginHandler := &handlers.LoginHandler{Controller: ctrl}
+	loginHandler := &handlers.Login{Controller: ctrl}
 	r.HandleFunc(paths.Login, loginHandler.Post).Methods(http.MethodPost)
 
-	logoutHandler := &handlers.LogoutHandler{Controller: ctrl}
+	logoutHandler := &handlers.Logout{Controller: ctrl}
 	r.HandleFunc(paths.Logout, logoutHandler.Post).Methods(http.MethodPost)
 }
 
-func setupAssignmentRoutes(r *mux.Router, ctrl *controller.Controller, mws *middlewares.Middlewares) {
-	assignmentHandler := &handlers.AssignmentHandler{Controller: ctrl}
-	authRouter(r, mws, middlewares.CreateAssignmentPermission).
+func setupAssignmentRoutes(r *mux.Router, ctrl *controller.Controller) {
+	assignmentHandler := &handlers.Assignment{Controller: ctrl}
+	authRouter(r, ctrl, middlewares.CreateAssignmentPermission).
 		HandleFunc(paths.Assignment, assignmentHandler.Post).Methods(http.MethodPost)
 
-	authRouter(r, mws, middlewares.ReadAssignmentPermission).
+	authRouter(r, ctrl, middlewares.ReadAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Get).Methods(http.MethodGet)
 
-	authRouter(r, mws, middlewares.UpdatessignmentPermission).
+	authRouter(r, ctrl, middlewares.UpdatessignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Patch).Methods(http.MethodPatch)
 
-	authRouter(r, mws, middlewares.DeleteAssignmentPermission).
+	authRouter(r, ctrl, middlewares.DeleteAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Delete).Methods(http.MethodDelete)
 }
 
-func setupTestRunRoutes(r *mux.Router, ctrl *controller.Controller, mws *middlewares.Middlewares) {
-	testrunHandler := &handlers.TestrunHandler{Controller: ctrl}
-	authRouter(r, mws, middlewares.CreateTestRunPermission).
+func setupTestRunRoutes(r *mux.Router, ctrl *controller.Controller) {
+	testrunHandler := &handlers.Testrun{Controller: ctrl}
+	authRouter(r, ctrl, middlewares.CreateTestRunPermission).
 		HandleFunc(paths.TestRun, testrunHandler.Post).Methods(http.MethodPost)
 }
 
-func authRouter(r *mux.Router, mws *middlewares.Middlewares, requiredPermissions ...string) *mux.Router {
+func authRouter(r *mux.Router, ctrl *controller.Controller, requiredPermissions ...string) *mux.Router {
 	authSubrouter := r.NewRoute().Subrouter()
-	mws.ApplyAll(authSubrouter)
-	authzMiddleware := middlewares.AuthzMiddleware{
-		RequiredPermissions: requiredPermissions,
-	}
-	authSubrouter.Use(authzMiddleware.Authorize)
+	authSubrouter.Use(
+		middlewares.Authentication{Controller: ctrl}.Authenticate)
+	authSubrouter.Use(
+		middlewares.Authorization{RequiredPermissions: requiredPermissions}.Authorize)
 	return authSubrouter
 }

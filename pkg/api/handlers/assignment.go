@@ -15,11 +15,11 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
-type AssignmentHandler struct {
+type Assignment struct {
 	Controller *controller.Controller
 }
 
-func (h *AssignmentHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *Assignment) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	var assignment model.Assignment
@@ -39,7 +39,7 @@ func (h *AssignmentHandler) Post(writer http.ResponseWriter, request *http.Reque
 	response.SendData(writer, http.StatusOK, assignment)
 }
 
-func (h *AssignmentHandler) Get(writer http.ResponseWriter, request *http.Request) {
+func (h *Assignment) Get(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -58,7 +58,7 @@ func (h *AssignmentHandler) Get(writer http.ResponseWriter, request *http.Reques
 	response.SendData(writer, http.StatusOK, assignment)
 }
 
-func (h *AssignmentHandler) Patch(writer http.ResponseWriter, request *http.Request) {
+func (h *Assignment) Patch(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
@@ -88,7 +88,7 @@ func (h *AssignmentHandler) Patch(writer http.ResponseWriter, request *http.Requ
 	response.SendData(writer, http.StatusOK, updatedAssignment)
 }
 
-func (h *AssignmentHandler) Delete(writer http.ResponseWriter, request *http.Request) {
+func (h *Assignment) Delete(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]

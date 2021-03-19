@@ -9,7 +9,7 @@ import (
 func (c *Controller) CreateTestrun() (string, error) {
 	jobName := "run tests in docker"
 	jobFunc := func() {
-		testsCfg := dexec.TestsRunConfig{
+		testsConfig := dexec.TestsRunConfig{
 			ImageName:       random.LowercaseString(10),
 			ContainerName:   random.LowercaseString(10),
 			Assignment:      "assignment1",             // get from body
@@ -18,7 +18,7 @@ func (c *Controller) CreateTestrun() (string, error) {
 			TestsGitUser:    c.Config.TestsGitUser,
 			TestsGitRepo:    c.Config.TestsGitRepo,
 		}
-		output, err := dexec.RunTests(testsCfg)
+		output, err := dexec.RunTests(testsConfig)
 		if err != nil {
 			log.Error().Println(err) // log status in db
 			log.Error().Println(output)

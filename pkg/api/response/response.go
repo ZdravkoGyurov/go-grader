@@ -19,7 +19,7 @@ func SendData(writer http.ResponseWriter, status int, data interface{}) {
 }
 
 func SendError(writer http.ResponseWriter, status int, err error) {
-	if err != nil {
+	if err == nil {
 		respondInternalError(writer)
 		log.Error().Println("failed to return nil error")
 		return

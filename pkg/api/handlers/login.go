@@ -9,11 +9,11 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 )
 
-type LoginHandler struct {
+type Login struct {
 	Controller *controller.Controller
 }
 
-func (h *LoginHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *Login) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	if _, err := request.Cookie(h.Controller.Config.SessionCookieName); err == nil {

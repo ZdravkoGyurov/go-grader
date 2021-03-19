@@ -9,11 +9,11 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
-type LogoutHandler struct {
+type Logout struct {
 	Controller *controller.Controller
 }
 
-func (h *LogoutHandler) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *Logout) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	cookie, err := request.Cookie(h.Controller.Config.SessionCookieName)
