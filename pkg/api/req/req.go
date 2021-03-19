@@ -5,8 +5,10 @@ import (
 	"net/http"
 )
 
-const (
-	PermissionsKey = iota
+type permissionsKey struct{}
+
+var (
+	PermissionsKey permissionsKey
 )
 
 func AddPermissions(r *http.Request, permissions []string) *http.Request {
