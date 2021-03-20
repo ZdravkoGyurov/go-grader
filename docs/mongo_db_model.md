@@ -53,6 +53,7 @@
 ### Course
 - ID             string
 - Name           string
+- Description    string
 - GithubRepoName string
   - CreateCourse(...)
   - ReadCourse(courseID string)
