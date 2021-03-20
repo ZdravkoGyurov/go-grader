@@ -29,6 +29,22 @@ func (s *Storage) ReadAssignment(ctx context.Context, assignmentID string) (*mod
 	return &assignment, nil
 }
 
+func (s *Storage) ReadAllAssignments(ctx context.Context, courseID string) ([]*model.Assignment, error) {
+	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(assignmentCollection)
+
+	cursor, err := collection.Find(ctx, filterAssignmentByCourseID(courseID))
+	if err != nil {
+		return nil, fmt.Errorf("failed to find all assignments with course_id %s: %w", courseID, err)
+	}
+
+	var assignments []*model.Assignment
+	if err = cursor.All(ctx, &assignments); err != nil {
+		return nil, fmt.Errorf("failed to decode all assignments with course_id %s: %w", courseID, err)
+	}
+
+	return assignments, nil
+}
+
 func (s *Storage) UpdateAssignment(ctx context.Context, assignmentID string, assignment *model.Assignment) (*model.Assignment, error) {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(assignmentCollection)
 	var updatedAssignment model.Assignment
