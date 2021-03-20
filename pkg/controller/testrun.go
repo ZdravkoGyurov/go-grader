@@ -6,7 +6,7 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
 )
 
-func (c *Controller) CreateTestrun() (string, error) {
+func (c *Controller) CreateSubmission() (string, error) {
 	jobName := "run tests in docker"
 	jobFunc := func() {
 		testsConfig := dexec.TestsRunConfig{

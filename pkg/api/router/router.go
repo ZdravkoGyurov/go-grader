@@ -17,7 +17,7 @@ func New(ctrl *controller.Controller) *mux.Router {
 	r.Use(middlewares.PanicRecovery)
 	setupAccountRoutes(r, ctrl)
 	setupAssignmentRoutes(r, ctrl)
-	setupTestRunRoutes(r, ctrl)
+	setupSubmissionRoutes(r, ctrl)
 	return r
 }
 
@@ -47,10 +47,10 @@ func setupAssignmentRoutes(r *mux.Router, ctrl *controller.Controller) {
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Delete).Methods(http.MethodDelete)
 }
 
-func setupTestRunRoutes(r *mux.Router, ctrl *controller.Controller) {
-	testrunHandler := &handlers.Testrun{Controller: ctrl}
-	authRouter(r, ctrl, middlewares.CreateTestRunPermission).
-		HandleFunc(paths.TestRun, testrunHandler.Post).Methods(http.MethodPost)
+func setupSubmissionRoutes(r *mux.Router, ctrl *controller.Controller) {
+	submissionHandler := &handlers.Submission{Controller: ctrl}
+	authRouter(r, ctrl, middlewares.CreateSubmissionPermission).
+		HandleFunc(paths.Submission, submissionHandler.Post).Methods(http.MethodPost)
 }
 
 func authRouter(r *mux.Router, ctrl *controller.Controller, requiredPermissions ...string) *mux.Router {

@@ -15,7 +15,7 @@ const (
 	UpdatessignmentPermission  = "UPDATE_ASSIGNMENT"
 	DeleteAssignmentPermission = "DELETE_ASSIGNMENT"
 
-	CreateTestRunPermission = "CREATE_TESTRUN"
+	CreateSubmissionPermission = "CREATE_SUBMISSION"
 )
 
 type Authorization struct {

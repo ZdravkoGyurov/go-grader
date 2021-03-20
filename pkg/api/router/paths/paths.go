@@ -9,5 +9,5 @@ const (
 	Assignment        = "/assignment"
 	AssignmentWithID  = "/assignment/{" + AssignmentIDParam + "}"
 
-	TestRun = "/testrun"
+	Submission = "/submission"
 )

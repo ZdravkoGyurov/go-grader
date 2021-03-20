@@ -7,14 +7,14 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 )
 
-type Testrun struct {
+type Submission struct {
 	Controller *controller.Controller
 }
 
-func (h *Testrun) Post(writer http.ResponseWriter, request *http.Request) {
+func (h *Submission) Post(writer http.ResponseWriter, request *http.Request) {
 	// ctx := request.Context()
 
-	_, err := h.Controller.CreateTestrun()
+	_, err := h.Controller.CreateSubmission()
 	if err != nil {
 		response.SendError(writer, http.StatusInternalServerError, err)
 		return
