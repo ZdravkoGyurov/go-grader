@@ -2,8 +2,8 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
@@ -13,7 +13,7 @@ func (s *Storage) CreateRequest(ctx context.Context, request *model.Request) err
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(requestCollection)
 	_, err := collection.InsertOne(ctx, request)
 	if err != nil {
-		return fmt.Errorf("failed to insert request: %w", err)
+		return errors.Wrap(err, "failed to insert request")
 	}
 
 	return nil
@@ -23,7 +23,7 @@ func (s *Storage) ReadRequest(ctx context.Context, requestID string) (*model.Req
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(requestCollection)
 	var request model.Request
 	if err := collection.FindOne(ctx, filterByID(requestID)).Decode(&request); err != nil {
-		return nil, fmt.Errorf("failed to find request with id %s: %w", requestID, err)
+		return nil, errors.Wrapf(err, "failed to find request with id %s", requestID)
 	}
 
 	return &request, nil
@@ -35,12 +35,12 @@ func (s *Storage) ReadAllRequests(ctx context.Context, userID string) ([]*model.
 
 	cursor, err := collection.Find(ctx, filterRequestByUserID(userID))
 	if err != nil {
-		return nil, fmt.Errorf("failed to find all requests with user_id %s: %w", userID, err)
+		return nil, errors.Wrapf(err, "failed to find all requests with user_id %s", userID)
 	}
 
 	var requests []*model.Request
 	if err = cursor.All(ctx, &requests); err != nil {
-		return nil, fmt.Errorf("failed to decode all requests with user_id %s: %w", userID, err)
+		return nil, errors.Wrapf(err, "failed to decode all requests with user_id %s", userID)
 	}
 
 	return requests, nil
@@ -50,7 +50,7 @@ func (s *Storage) UpdateRequest(ctx context.Context, requestID string, request *
 	var updatedRequest model.Request
 	result := collection.FindOneAndUpdate(ctx, filterByID(requestID), update(request), updateOpts())
 	if err := result.Decode(&updatedRequest); err != nil {
-		return nil, fmt.Errorf("failed to find and update request with id %s: %w", requestID, err)
+		return nil, errors.Wrapf(err, "failed to find and update request with id %s", requestID)
 	}
 
 	return &updatedRequest, nil
@@ -59,7 +59,7 @@ func (s *Storage) UpdateRequest(ctx context.Context, requestID string, request *
 func (s *Storage) DeleteRequest(ctx context.Context, requestID string) error {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(requestCollection)
 	if _, err := collection.DeleteOne(ctx, filterByID(requestID)); err != nil {
-		return fmt.Errorf("failed to delete request with id %s: %w", requestID, err)
+		return errors.Wrapf(err, "failed to delete request with id %s", err)
 	}
 	return nil
 }

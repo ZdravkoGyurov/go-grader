@@ -2,8 +2,8 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
@@ -13,7 +13,7 @@ func (s *Storage) CreateAssignment(ctx context.Context, assignment *model.Assign
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(assignmentCollection)
 	_, err := collection.InsertOne(ctx, assignment)
 	if err != nil {
-		return fmt.Errorf("failed to insert assignment: %w", err)
+		return errors.Wrap(err, "failed to insert assignment")
 	}
 
 	return nil
@@ -23,7 +23,7 @@ func (s *Storage) ReadAssignment(ctx context.Context, assignmentID string) (*mod
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(assignmentCollection)
 	var assignment model.Assignment
 	if err := collection.FindOne(ctx, filterByID(assignmentID)).Decode(&assignment); err != nil {
-		return nil, fmt.Errorf("failed to find assignment with id %s: %w", assignmentID, err)
+		return nil, errors.Wrapf(err, "failed to find assignment with id %s", assignmentID)
 	}
 
 	return &assignment, nil
@@ -34,12 +34,12 @@ func (s *Storage) ReadAllAssignments(ctx context.Context, courseID string) ([]*m
 
 	cursor, err := collection.Find(ctx, filterAssignmentByCourseID(courseID))
 	if err != nil {
-		return nil, fmt.Errorf("failed to find all assignments with course_id %s: %w", courseID, err)
+		return nil, errors.Wrapf(err, "failed to find all assignments with course_id %s", courseID)
 	}
 
 	var assignments []*model.Assignment
 	if err = cursor.All(ctx, &assignments); err != nil {
-		return nil, fmt.Errorf("failed to decode all assignments with course_id %s: %w", courseID, err)
+		return nil, errors.Wrapf(err, "failed to decode all assignments with course_id %s", courseID)
 	}
 
 	return assignments, nil
@@ -50,7 +50,7 @@ func (s *Storage) UpdateAssignment(ctx context.Context, assignmentID string, ass
 	var updatedAssignment model.Assignment
 	result := collection.FindOneAndUpdate(ctx, filterByID(assignmentID), update(assignment), updateOpts())
 	if err := result.Decode(&updatedAssignment); err != nil {
-		return nil, fmt.Errorf("failed to find and update assignment with id %s: %w", assignmentID, err)
+		return nil, errors.Wrapf(err, "failed to find and update assignment with id %s", assignmentID)
 	}
 
 	return &updatedAssignment, nil
@@ -59,7 +59,7 @@ func (s *Storage) UpdateAssignment(ctx context.Context, assignmentID string, ass
 func (s *Storage) DeleteAssignment(ctx context.Context, assignmentID string) error {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(assignmentCollection)
 	if _, err := collection.DeleteOne(ctx, filterByID(assignmentID)); err != nil {
-		return fmt.Errorf("failed to delete assignment with id %s: %w", assignmentID, err)
+		return errors.Wrapf(err, "failed to delete assignment with id %s", assignmentID)
 	}
 	return nil
 }

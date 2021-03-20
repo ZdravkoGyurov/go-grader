@@ -1,12 +1,11 @@
 package middlewares
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/req"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 )
 
 const (
@@ -34,7 +33,7 @@ func (m Authorization) Authorize(next http.Handler) http.Handler {
 		userPermMap := permissionsMap(userPermissions...)
 		for _, perm := range m.RequiredPermissions {
 			if _, ok := userPermMap[perm]; !ok {
-				err := fmt.Errorf("failed to authorize user, missing %s permission", perm)
+				err := errors.Newf("failed to authorize user, missing %s permission", perm)
 				response.SendError(writer, http.StatusForbidden, err)
 				return
 			}

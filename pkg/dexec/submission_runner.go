@@ -1,8 +1,7 @@
 package dexec
 
 import (
-	"fmt"
-
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
@@ -19,13 +18,13 @@ type TestsRunConfig struct {
 func RunTests(testsConfig TestsRunConfig) (string, error) {
 	output, err := buildAssignmentImage(testsConfig, "pkg/dexec/.")
 	if err != nil {
-		return output, fmt.Errorf("failed docker build: %w", err)
+		return output, errors.Wrap(err, "failed docker build")
 	}
 	defer handleRemoveImage(testsConfig.ImageName)
 
 	output, err = runImage(testsConfig.ImageName, testsConfig.ContainerName)
 	if err != nil && false { // TODO: check additionally if error was from test fail
-		return output, fmt.Errorf("failed docker run: %w", err)
+		return output, errors.Wrap(err, "failed docker run")
 	}
 	defer handleRemoveContainer(testsConfig.ContainerName)
 

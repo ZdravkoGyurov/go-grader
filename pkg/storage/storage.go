@@ -2,13 +2,13 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/app/config"
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 )
 
@@ -20,7 +20,7 @@ type Storage struct {
 func New(ctx context.Context, config config.Config) (*Storage, error) {
 	mongoClient, err := connect(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, errors.Wrap(err, "failed to connect to the database")
 	}
 
 	return &Storage{

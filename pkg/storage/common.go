@@ -1,10 +1,10 @@
 package storage
 
 import (
-	"errors"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 )
 
 func filterByID(id string) bson.M {

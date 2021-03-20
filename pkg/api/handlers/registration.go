@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 )
 
 type Registration struct {

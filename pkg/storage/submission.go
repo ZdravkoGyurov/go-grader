@@ -2,8 +2,8 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
@@ -13,7 +13,7 @@ func (s *Storage) CreateSubmission(ctx context.Context, submission *model.Submis
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(submissionCollection)
 	_, err := collection.InsertOne(ctx, submission)
 	if err != nil {
-		return fmt.Errorf("failed to insert submission: %w", err)
+		return errors.Wrap(err, "failed to insert submission")
 	}
 
 	return nil
@@ -23,7 +23,7 @@ func (s *Storage) ReadSubmission(ctx context.Context, submissionID string) (*mod
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(submissionCollection)
 	var submission model.Submission
 	if err := collection.FindOne(ctx, filterByID(submissionID)).Decode(&submission); err != nil {
-		return nil, fmt.Errorf("failed to find submission with id %s: %w", submissionID, err)
+		return nil, errors.Wrapf(err, "failed to find submission with id %s", submissionID)
 	}
 
 	return &submission, nil
@@ -36,17 +36,19 @@ func (s *Storage) ReadAllSubmissions(ctx context.Context, userID, assignmentID s
 
 	filter, err := filterSubmissions(userID, assignmentID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create submissions filter with user_id %s and assignment_id %s: %w", userID, assignmentID, err)
+		err = errors.Wrapf(err, "failed to create submissions filter with user_id %s and assignment_id %s", userID, assignmentID)
+		return nil, err
 	}
 
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find all submissions with user_id %s and assignment_id %s: %w", userID, assignmentID, err)
+		err = errors.Wrapf(err, "failed to find all submissions with user_id %s and assignment_id %s", userID, assignmentID)
+		return nil, err
 	}
 
 	var submissions []*model.Submission
 	if err = cursor.All(ctx, &submissions); err != nil {
-		return nil, fmt.Errorf("failed to decode all submissions: %w", err)
+		return nil, errors.Wrap(err, "failed to decode all submissions")
 	}
 
 	return submissions, nil
@@ -57,7 +59,8 @@ func (s *Storage) UpdateSubmission(ctx context.Context, submissionID string, sub
 	var updatedSubmission model.Submission
 	result := collection.FindOneAndUpdate(ctx, filterByID(submissionID), update(submission), updateOpts())
 	if err := result.Decode(&updatedSubmission); err != nil {
-		return nil, fmt.Errorf("failed to find and update submission with id %s: %w", submissionID, err)
+		err = errors.Wrapf(err, "failed to find and update submission with id %s", submissionID)
+		return nil, err
 	}
 
 	return &updatedSubmission, nil
@@ -66,7 +69,7 @@ func (s *Storage) UpdateSubmission(ctx context.Context, submissionID string, sub
 func (s *Storage) DeleteSubmission(ctx context.Context, submissionID string) error {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(submissionCollection)
 	if _, err := collection.DeleteOne(ctx, filterByID(submissionID)); err != nil {
-		return fmt.Errorf("failed to delete submission with id %s: %w", submissionID, err)
+		return errors.Wrapf(err, "failed to delete submission with id %s", submissionID)
 	}
 	return nil
 }

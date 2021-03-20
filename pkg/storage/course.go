@@ -2,10 +2,11 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
+	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
 const courseCollection = "courses"
@@ -14,7 +15,7 @@ func (s *Storage) CreateCourse(ctx context.Context, course *model.Course) error 
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(courseCollection)
 	_, err := collection.InsertOne(ctx, course)
 	if err != nil {
-		return fmt.Errorf("failed to insert collection: %w", err)
+		return errors.Wrap(err, "failed to insert collection")
 	}
 
 	return nil
@@ -24,7 +25,7 @@ func (s *Storage) ReadCourse(ctx context.Context, courseID string) (*model.Cours
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(courseCollection)
 	var course model.Course
 	if err := collection.FindOne(ctx, filterByID(courseID)).Decode(&course); err != nil {
-		return nil, fmt.Errorf("failed to find course with id %s: %w", courseID, err)
+		return nil, errors.Wrapf(err, "failed to find course with id %s", courseID)
 	}
 
 	return &course, nil
@@ -35,12 +36,12 @@ func (s *Storage) ReadAllCourses(ctx context.Context) ([]*model.Course, error) {
 
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to find all courses: %w", err)
+		return nil, errors.Wrap(err, "failed to find all courses")
 	}
 
 	var courses []*model.Course
 	if err = cursor.All(ctx, &courses); err != nil {
-		return nil, fmt.Errorf("failed to decode all courses: %w", err)
+		return nil, errors.Wrap(err, "failed to decode all courses")
 	}
 
 	return courses, nil
@@ -51,7 +52,7 @@ func (s *Storage) UpdateCourse(ctx context.Context, courseID string, course *mod
 	var updatedCourse model.Course
 	result := collection.FindOneAndUpdate(ctx, filterByID(courseID), update(course), updateOpts())
 	if err := result.Decode(&updatedCourse); err != nil {
-		return nil, fmt.Errorf("failed to find and update course with id %s: %w", courseID, err)
+		return nil, errors.Wrapf(err, "failed to find and update course with id %s", courseID)
 	}
 
 	return &updatedCourse, nil
@@ -60,7 +61,7 @@ func (s *Storage) UpdateCourse(ctx context.Context, courseID string, course *mod
 func (s *Storage) DeleteCourse(ctx context.Context, courseID string) error {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(courseCollection)
 	if _, err := collection.DeleteOne(ctx, filterByID(courseID)); err != nil {
-		return fmt.Errorf("failed to delete course with id %s: %w", courseID, err)
+		return errors.Wrapf(err, "failed to delete course with id %s", courseID)
 	}
 	return nil
 }
