@@ -36,6 +36,13 @@ func filterSubmissions(userID, assignmentID string) (bson.M, error) {
 	return bson.M{}, errors.New("pass user_id and/or assignment_id to filter submissions")
 }
 
+func filterRequestByUserID(userID string) bson.M {
+	if userID == "" {
+		return bson.M{}
+	}
+	return bson.M{"user_id": userID}
+}
+
 func updateOpts() *options.FindOneAndUpdateOptions {
 	returnDocumentOption := options.After
 	options := &options.FindOneAndUpdateOptions{
