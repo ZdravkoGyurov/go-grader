@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/api"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
@@ -30,7 +31,7 @@ func (h *Assignment) Post(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if err := h.Controller.CreateAssignment(ctx, &assignment); err != nil {
-		response.SendError(writer, http.StatusInternalServerError, err)
+		response.SendError(writer, api.StatusCode(err), err)
 		return
 	}
 
@@ -41,7 +42,7 @@ func (h *Assignment) Post(writer http.ResponseWriter, request *http.Request) {
 func (h *Assignment) Get(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
+	assignmentID, ok := mux.Vars(request)[paths.IDParam]
 	if !ok {
 		err := errors.New("failed to get assignment id path parameter")
 		response.SendError(writer, http.StatusInternalServerError, err)
@@ -50,7 +51,7 @@ func (h *Assignment) Get(writer http.ResponseWriter, request *http.Request) {
 
 	assignment, err := h.Controller.GetAssignment(ctx, assignmentID)
 	if err != nil {
-		response.SendError(writer, http.StatusInternalServerError, err)
+		response.SendError(writer, api.StatusCode(err), err)
 		return
 	}
 
@@ -60,7 +61,7 @@ func (h *Assignment) Get(writer http.ResponseWriter, request *http.Request) {
 func (h *Assignment) Patch(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
+	assignmentID, ok := mux.Vars(request)[paths.IDParam]
 	if !ok {
 		err := errors.New("failed to get assignment id path parameter")
 		response.SendError(writer, http.StatusInternalServerError, err)
@@ -79,7 +80,7 @@ func (h *Assignment) Patch(writer http.ResponseWriter, request *http.Request) {
 	updatedAssignment, err := h.Controller.UpdateAssignment(ctx, assignmentID, &updateAssignment)
 	if err != nil {
 		err = errors.Wrap(err, "failed to marshal assignment json data")
-		response.SendError(writer, http.StatusInternalServerError, err)
+		response.SendError(writer, api.StatusCode(err), err)
 		return
 	}
 
@@ -90,7 +91,7 @@ func (h *Assignment) Patch(writer http.ResponseWriter, request *http.Request) {
 func (h *Assignment) Delete(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	assignmentID, ok := mux.Vars(request)[paths.AssignmentIDParam]
+	assignmentID, ok := mux.Vars(request)[paths.IDParam]
 	if !ok {
 		err := errors.New("failed to get assignment id path parameter")
 		response.SendError(writer, http.StatusInternalServerError, err)
@@ -98,7 +99,7 @@ func (h *Assignment) Delete(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if err := h.Controller.DeleteAssignment(ctx, assignmentID); err != nil {
-		response.SendError(writer, http.StatusInternalServerError, err)
+		response.SendError(writer, api.StatusCode(err), err)
 		return
 	}
 

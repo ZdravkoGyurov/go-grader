@@ -17,6 +17,7 @@ func New(ctrl *controller.Controller) *mux.Router {
 	r.Use(middlewares.PanicRecovery)
 	setupAccountRoutes(r, ctrl)
 	setupAssignmentRoutes(r, ctrl)
+	setupCourseRoutes(r, ctrl)
 	setupSubmissionRoutes(r, ctrl)
 	return r
 }
@@ -40,11 +41,29 @@ func setupAssignmentRoutes(r *mux.Router, ctrl *controller.Controller) {
 	authRouter(r, ctrl, middlewares.ReadAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Get).Methods(http.MethodGet)
 
-	authRouter(r, ctrl, middlewares.UpdatessignmentPermission).
+	authRouter(r, ctrl, middlewares.UpdateAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Patch).Methods(http.MethodPatch)
 
 	authRouter(r, ctrl, middlewares.DeleteAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Delete).Methods(http.MethodDelete)
+}
+
+func setupCourseRoutes(r *mux.Router, ctrl *controller.Controller) {
+	courseHandler := &handlers.Course{Controller: ctrl}
+	authRouter(r, ctrl, middlewares.CreateCoursePermission).
+		HandleFunc(paths.Course, courseHandler.Post).Methods(http.MethodPost)
+
+	authRouter(r, ctrl, middlewares.ReadCoursePermission).
+		HandleFunc(paths.Course, courseHandler.GetAll).Methods(http.MethodGet)
+
+	authRouter(r, ctrl, middlewares.ReadCoursePermission).
+		HandleFunc(paths.CourseWithID, courseHandler.Get).Methods(http.MethodGet)
+
+	authRouter(r, ctrl, middlewares.UpdateCoursePermission).
+		HandleFunc(paths.CourseWithID, courseHandler.Patch).Methods(http.MethodPatch)
+
+	authRouter(r, ctrl, middlewares.DeleteAssignmentPermission).
+		HandleFunc(paths.CourseWithID, courseHandler.Delete).Methods(http.MethodDelete)
 }
 
 func setupSubmissionRoutes(r *mux.Router, ctrl *controller.Controller) {

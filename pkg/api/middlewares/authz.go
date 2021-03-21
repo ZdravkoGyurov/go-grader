@@ -11,8 +11,13 @@ import (
 const (
 	CreateAssignmentPermission = "CREATE_ASSIGNMENT"
 	ReadAssignmentPermission   = "READ_ASSIGNMENT"
-	UpdatessignmentPermission  = "UPDATE_ASSIGNMENT"
+	UpdateAssignmentPermission = "UPDATE_ASSIGNMENT"
 	DeleteAssignmentPermission = "DELETE_ASSIGNMENT"
+
+	CreateCoursePermission = "CREATE_COURSE"
+	ReadCoursePermission   = "READ_COURSE"
+	UpdateCoursePermission = "UPDATE_COURSE"
+	DeleteCoursePermission = "DELETE_COURSE"
 
 	CreateSubmissionPermission = "CREATE_SUBMISSION"
 )

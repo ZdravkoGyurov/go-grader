@@ -38,7 +38,7 @@ func (s *Storage) ReadAllRequests(ctx context.Context, userID string) ([]*model.
 		return nil, errors.Wrapf(storageError(err), "failed to find all requests with user_id %s", userID)
 	}
 
-	var requests []*model.Request
+	requests := make([]*model.Request, 0)
 	if err = cursor.All(ctx, &requests); err != nil {
 		return nil, errors.Wrapf(storageError(err), "failed to decode all requests with user_id %s", userID)
 	}

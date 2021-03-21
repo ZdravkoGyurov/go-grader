@@ -39,7 +39,7 @@ func (s *Storage) ReadAllCourses(ctx context.Context) ([]*model.Course, error) {
 		return nil, errors.Wrap(storageError(err), "failed to find all courses")
 	}
 
-	var courses []*model.Course
+	courses := make([]*model.Course, 0)
 	if err = cursor.All(ctx, &courses); err != nil {
 		return nil, errors.Wrap(storageError(err), "failed to decode all courses")
 	}

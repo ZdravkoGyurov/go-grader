@@ -49,7 +49,7 @@ func (s *Storage) ReadAllUsers(ctx context.Context, courseID string) ([]*model.U
 		return nil, errors.Wrapf(storageError(err), "failed to find all users with course_id %s", courseID)
 	}
 
-	var users []*model.User
+	users := make([]*model.User, 0)
 	if err = cursor.All(ctx, &users); err != nil {
 		return nil, errors.Wrapf(storageError(err), "failed to decode all users with course_id %s", courseID)
 	}

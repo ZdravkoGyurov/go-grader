@@ -46,7 +46,7 @@ func (s *Storage) ReadAllSubmissions(ctx context.Context, userID, assignmentID s
 		return nil, err
 	}
 
-	var submissions []*model.Submission
+	submissions := make([]*model.Submission, 0)
 	if err = cursor.All(ctx, &submissions); err != nil {
 		return nil, errors.Wrap(storageError(err), "failed to decode all submissions")
 	}

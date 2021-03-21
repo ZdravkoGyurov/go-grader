@@ -37,7 +37,7 @@ func (s *Storage) ReadAllAssignments(ctx context.Context, courseID string) ([]*m
 		return nil, errors.Wrapf(storageError(err), "failed to find all assignments with course_id %s", courseID)
 	}
 
-	var assignments []*model.Assignment
+	assignments := make([]*model.Assignment, 0)
 	if err = cursor.All(ctx, &assignments); err != nil {
 		return nil, errors.Wrapf(storageError(err), "failed to decode all assignments with course_id %s", courseID)
 	}
