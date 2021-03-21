@@ -6,6 +6,12 @@ import (
 )
 
 var (
+	ErrInvalidInput = New("input is invalid")
+	ErrNoDocuments  = New("document does not exist")
+	ErrIsDuplicate  = New("document already exists")
+)
+
+var (
 	New    = errors.New
 	Is     = errors.Is
 	As     = errors.As
