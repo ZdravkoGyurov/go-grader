@@ -39,6 +39,9 @@ func setupAssignmentRoutes(r *mux.Router, ctrl *controller.Controller) {
 		HandleFunc(paths.Assignment, assignmentHandler.Post).Methods(http.MethodPost)
 
 	authRouter(r, ctrl, middlewares.ReadAssignmentPermission).
+		HandleFunc(paths.Assignment, assignmentHandler.GetAll).Methods(http.MethodGet)
+
+	authRouter(r, ctrl, middlewares.ReadAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Get).Methods(http.MethodGet)
 
 	authRouter(r, ctrl, middlewares.UpdateAssignmentPermission).

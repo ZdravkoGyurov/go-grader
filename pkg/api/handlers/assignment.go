@@ -23,8 +23,7 @@ func (h *Assignment) Post(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	var assignment model.Assignment
-	decoder := json.NewDecoder(request.Body)
-	if err := decoder.Decode(&assignment); err != nil {
+	if err := json.NewDecoder(request.Body).Decode(&assignment); err != nil {
 		err = errors.Wrap(err, "failed to decode assignment from request body")
 		response.SendError(writer, http.StatusBadRequest, err)
 		return
@@ -37,6 +36,27 @@ func (h *Assignment) Post(writer http.ResponseWriter, request *http.Request) {
 
 	log.Info().Printf("created assignment with id %s\n", assignment.ID)
 	response.SendData(writer, http.StatusOK, assignment)
+}
+
+func (h *Assignment) GetAll(writer http.ResponseWriter, request *http.Request) {
+	ctx := request.Context()
+
+	body := struct {
+		CourseID string `json:"course_id"`
+	}{}
+	if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+		err = errors.Wrap(err, "failed to decode course_id from request body")
+		response.SendError(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	assignments, err := h.Controller.GetAllAssignments(ctx, body.CourseID)
+	if err != nil {
+		response.SendError(writer, api.StatusCode(err), err)
+		return
+	}
+
+	response.SendData(writer, http.StatusOK, assignments)
 }
 
 func (h *Assignment) Get(writer http.ResponseWriter, request *http.Request) {

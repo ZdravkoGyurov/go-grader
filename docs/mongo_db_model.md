@@ -35,7 +35,7 @@
   - UpdateSubmission(submissionID string)
   - DeleteSubmission(submissionID string)
 
-### Assignment
+<!-- ### Assignment
 - ID          string
 - Name        string
 - Description string
@@ -46,9 +46,9 @@
   - ReadAssignment(assignmentID string)
   - ReadAllAssignments(courseID string)
   - UpdateAssignment(assignmentID string)
-  - DeleteAssignment(assignmentID string)
+  - DeleteAssignment(assignmentID string) -->
 
-### Course
+<!-- ### Course
 - ID             string
 - Name           string
 - Description    string
@@ -57,7 +57,7 @@
   - ReadCourse(courseID string)
   - ReadAllCourses()
   - UpdateCourse(courseID string, ...)
-  - DeleteCourse(courseID string)
+  - DeleteCourse(courseID string) -->
 
 ### Request
 - ID          string
