@@ -20,6 +20,10 @@ const (
 	DeleteCoursePermission = "DELETE_COURSE"
 
 	CreateSubmissionPermission = "CREATE_SUBMISSION"
+
+	ReadUsersPermission  = "READ_USERS"
+	UpdateUserPermission = "UPDATE_USER"
+	DeleteUserPermission = "DELETE_USER"
 )
 
 type Authorization struct {

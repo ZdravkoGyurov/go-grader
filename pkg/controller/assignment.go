@@ -25,6 +25,7 @@ func (c *Controller) GetAllAssignments(ctx context.Context, courseID string) ([]
 	if courseID == "" {
 		return nil, errors.Wrap(errors.ErrInvalidInput, "course id cannot be empty")
 	}
+
 	assignments, err := c.storage.ReadAllAssignments(ctx, courseID)
 	if err != nil {
 		return nil, err

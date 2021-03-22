@@ -13,5 +13,8 @@ const (
 	Course       = "/course"
 	CourseWithID = "/course/{" + IDParam + "}"
 
+	User       = "/user"
+	UserWithID = "/user/{" + IDParam + "}"
+
 	Submission = "/submission"
 )

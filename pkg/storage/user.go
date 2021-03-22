@@ -5,6 +5,8 @@ import (
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const userCollection = "users"
@@ -44,7 +46,8 @@ func (s *Storage) ReadUserByUsername(ctx context.Context, username string) (*mod
 func (s *Storage) ReadAllUsers(ctx context.Context, courseID string) ([]*model.User, error) {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(userCollection)
 
-	cursor, err := collection.Find(ctx, filterUsersByCourseID(courseID))
+	findOpts := options.Find().SetProjection(bson.M{"password": 0})
+	cursor, err := collection.Find(ctx, filterUsersByCourseID(courseID), findOpts)
 	if err != nil {
 		return nil, errors.Wrapf(storageError(err), "failed to find all users with course_id %s", courseID)
 	}

@@ -7,7 +7,7 @@
   - ReadSession(sessionID string)
   - DeleteSession(sessionID string) -->
 
-### User
+<!-- ### User
 - ID             string
 - Username       string
 - GithubUsername string
@@ -21,7 +21,7 @@
   - ReadUserByUsername(username string)
   - ReadAllUsers(courseID string)
   - UpdateUser(userID string)
-  - DeleteUser(userID string)
+  - DeleteUser(userID string) -->
 
 ### Submission
 - ID           string

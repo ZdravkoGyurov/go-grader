@@ -19,6 +19,7 @@ func New(ctrl *controller.Controller) *mux.Router {
 	setupAssignmentRoutes(r, ctrl)
 	setupCourseRoutes(r, ctrl)
 	setupSubmissionRoutes(r, ctrl)
+	setupUserRoutes(r, ctrl)
 	return r
 }
 
@@ -73,6 +74,13 @@ func setupSubmissionRoutes(r *mux.Router, ctrl *controller.Controller) {
 	submissionHandler := &handlers.Submission{Controller: ctrl}
 	authRouter(r, ctrl, middlewares.CreateSubmissionPermission).
 		HandleFunc(paths.Submission, submissionHandler.Post).Methods(http.MethodPost)
+}
+
+func setupUserRoutes(r *mux.Router, ctrl *controller.Controller) {
+	userHandler := &handlers.User{Controller: ctrl}
+	authRouter(r, ctrl, middlewares.ReadUsersPermission).HandleFunc(paths.User, userHandler.GetAll).Methods(http.MethodGet)
+	authRouter(r, ctrl, middlewares.UpdateUserPermission).HandleFunc(paths.UserWithID, userHandler.Patch).Methods(http.MethodPatch)
+	authRouter(r, ctrl, middlewares.DeleteUserPermission).HandleFunc(paths.UserWithID, userHandler.Delete).Methods(http.MethodDelete)
 }
 
 func authRouter(r *mux.Router, ctrl *controller.Controller, requiredPermissions ...string) *mux.Router {
