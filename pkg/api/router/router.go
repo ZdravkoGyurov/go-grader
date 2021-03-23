@@ -74,6 +74,14 @@ func setupSubmissionRoutes(r *mux.Router, ctrl *controller.Controller) {
 	submissionHandler := &handlers.Submission{Controller: ctrl}
 	authRouter(r, ctrl, middlewares.CreateSubmissionPermission).
 		HandleFunc(paths.Submission, submissionHandler.Post).Methods(http.MethodPost)
+	authRouter(r, ctrl, middlewares.ReadSubmissionPermission).
+		HandleFunc(paths.Submission, submissionHandler.GetAll).Methods(http.MethodGet)
+	authRouter(r, ctrl, middlewares.ReadSubmissionPermission).
+		HandleFunc(paths.SubmissionWithID, submissionHandler.Get).Methods(http.MethodGet)
+	authRouter(r, ctrl, middlewares.UpdateSubmissionPermission).
+		HandleFunc(paths.SubmissionWithID, submissionHandler.Patch).Methods(http.MethodPatch)
+	authRouter(r, ctrl, middlewares.DeleteSubmissionPermission).
+		HandleFunc(paths.SubmissionWithID, submissionHandler.Delete).Methods(http.MethodDelete)
 }
 
 func setupUserRoutes(r *mux.Router, ctrl *controller.Controller) {

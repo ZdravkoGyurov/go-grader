@@ -20,6 +20,9 @@ const (
 	DeleteCoursePermission = "DELETE_COURSE"
 
 	CreateSubmissionPermission = "CREATE_SUBMISSION"
+	ReadSubmissionPermission   = "READ_SUBMISSION"
+	UpdateSubmissionPermission = "UPDATE_SUBMISSION"
+	DeleteSubmissionPermission = "DELETE_SUBMISSION"
 
 	ReadUsersPermission  = "READ_USERS"
 	UpdateUserPermission = "UPDATE_USER"

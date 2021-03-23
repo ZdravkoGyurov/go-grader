@@ -7,14 +7,15 @@ const (
 
 	IDParam = "id"
 
-	Assignment       = "/assignment"
-	AssignmentWithID = "/assignment/{" + IDParam + "}"
+	User       = "/user"
+	UserWithID = "/user/{" + IDParam + "}"
 
 	Course       = "/course"
 	CourseWithID = "/course/{" + IDParam + "}"
 
-	User       = "/user"
-	UserWithID = "/user/{" + IDParam + "}"
+	Assignment       = "/assignment"
+	AssignmentWithID = "/assignment/{" + IDParam + "}"
 
-	Submission = "/submission"
+	Submission       = "/submission"
+	SubmissionWithID = "/submission/{" + IDParam + "}"
 )
