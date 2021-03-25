@@ -23,7 +23,7 @@
   - UpdateUser(userID string)
   - DeleteUser(userID string) -->
 
-### Submission
+<!-- ### Submission
 - ID           string
 - Results      string?
 - Status       string
@@ -33,7 +33,7 @@
   - ReadSubmission(submissionID string)
   - ReadAllSubmissions(userID string, assignmentID string)
   - UpdateSubmission(submissionID string)
-  - DeleteSubmission(submissionID string)
+  - DeleteSubmission(submissionID string) -->
 
 <!-- ### Assignment
 - ID          string

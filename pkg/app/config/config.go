@@ -28,7 +28,7 @@ func DefaultConfig() Config {
 		ServerWriteTimeout:        30 * time.Second,
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
-		DatabaseURI:               "mongodb://host.docker.internal:27017",
+		DatabaseURI:               "mongodb://host.docker.internal:27017,host.docker.internal:27018,host.docker.internal:27019/grader?replicaSet=gograder-mongo-set",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
 		DatabaseName:              "grader",
