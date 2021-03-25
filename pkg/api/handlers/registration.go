@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
 	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
+	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
 type Registration struct {
@@ -28,7 +30,16 @@ func (h *Registration) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := h.Controller.Register(ctx, username, password); err != nil {
+	var user model.User
+	if err := json.NewDecoder(request.Body).Decode(&user); err != nil {
+		err = errors.Wrap(err, "failed to decode user from request body")
+		response.SendError(writer, http.StatusBadRequest, err)
+		return
+	}
+	user.Username = username
+	user.Password = password
+
+	if err := h.Controller.Register(ctx, &user); err != nil {
 		response.SendError(writer, http.StatusInternalServerError, err)
 		return
 	}
