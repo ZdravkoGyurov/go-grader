@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (c *Controller) CreateSubmission(ctx context.Context, submission *model.Submission) error {
+func (c *Controller) CreateSubmission(ctx context.Context, submission *model.Submission, githubUsername string) error {
 	submission.ID = uuid.NewString()
 	submission.Result = ""
 	submission.Status = "PENDING"
@@ -22,30 +22,49 @@ func (c *Controller) CreateSubmission(ctx context.Context, submission *model.Sub
 
 	jobName := "run tests in docker"
 	jobFunc := func() {
-		testsConfig := dexec.TestsRunConfig{
-			ImageName:       random.LowercaseString(10),
-			ContainerName:   random.LowercaseString(10),
-			Assignment:      "assignment1",             // get assignmentID from body and get assignmentName from db
-			SolutionGitUser: "ZdravkoGyurov",           // get userID from session and get gitUsername from db
-			SolutionGitRepo: "grader-docker-solutions", // get assignmentID from body and get gitCourseName from db
-			TestsGitUser:    c.Config.TestsGitUser,
-			TestsGitRepo:    c.Config.TestsGitRepo,
-		}
-		output, err := dexec.RunTests(testsConfig)
-		if err != nil {
-			log.Error().Println(err) // log status in db
-			log.Error().Println(output)
-			return
-		}
+		trxCtx, cancelDBReq := context.WithTimeout(context.Background(), c.Config.DBRequestTimeout)
+		defer cancelDBReq()
+		c.storage.Transaction(trxCtx, func(ctx context.Context) error {
+			assignment, err := c.storage.ReadAssignment(ctx, submission.AssignmentID)
+			if err != nil {
+				return err
+			}
+			course, err := c.storage.ReadCourse(ctx, assignment.CourseID)
+			if err != nil {
+				return err
+			}
 
-		submission.Result = output
-		submission.Status = "DONE"
-		updateCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-		_, err = c.UpdateSubmission(updateCtx, submission.ID, submission)
-		if err != nil {
-			log.Error().Println(err)
-		}
+			testsConfig := dexec.TestsRunConfig{
+				ImageName:       random.LowercaseString(10),
+				ContainerName:   random.LowercaseString(10),
+				Assignment:      assignment.Name,
+				SolutionGitUser: githubUsername,
+				SolutionGitRepo: course.GithubRepoName,
+				TestsGitUser:    c.Config.TestsGitUser,
+				TestsGitRepo:    c.Config.TestsGitRepo,
+			}
+
+			// maybe stop transaction
+			output, err := dexec.RunTests(testsConfig)
+			if err != nil {
+				log.Error().Println(err)
+				log.Error().Println(output)
+				return err
+			}
+
+			submission.Result = output
+			submission.Status = "DONE"
+			updateCtx, cancelUpdate := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancelUpdate()
+			_, err = c.UpdateSubmission(updateCtx, submission.ID, submission)
+			if err != nil {
+				log.Error().Println(err)
+				return err
+			}
+
+			return nil
+		})
+
 	}
 	_, err := c.executor.QueueJob(jobName, jobFunc)
 	if err != nil {

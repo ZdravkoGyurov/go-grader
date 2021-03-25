@@ -35,14 +35,14 @@ type Authorization struct {
 
 func (m Authorization) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		userPermissions, ok := req.GetPermissions(request)
+		reqData, ok := req.GetRequestData(request)
 		if !ok {
 			err := errors.New("failed to get user from request context values")
 			response.SendError(writer, http.StatusInternalServerError, err)
 			return
 		}
 
-		userPermMap := permissionsMap(userPermissions...)
+		userPermMap := permissionsMap(reqData.Permissions...)
 		for _, perm := range m.RequiredPermissions {
 			if _, ok := userPermMap[perm]; !ok {
 				err := errors.Newf("failed to authorize user, missing %s permission", perm)

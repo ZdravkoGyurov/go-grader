@@ -13,6 +13,7 @@ type Config struct {
 	DatabaseURI               string
 	DBConnectTimeout          time.Duration
 	DBDisconnectTimeout       time.Duration
+	DBRequestTimeout          time.Duration
 	DatabaseName              string
 	ServerShutdownTimeout     time.Duration
 	SessionCookieName         string
@@ -28,9 +29,10 @@ func DefaultConfig() Config {
 		ServerWriteTimeout:        30 * time.Second,
 		MaxExecutorWorkers:        5,
 		MaxExecutorConcurrentJobs: 100,
-		DatabaseURI:               "mongodb://host.docker.internal:27017,host.docker.internal:27018,host.docker.internal:27019/grader?replicaSet=gograder-mongo-set",
+		DatabaseURI:               "mongodb://localhost:27017,localhost:27018,localhost:27019/grader?replicaSet=gograder-mongo-set",
 		DBConnectTimeout:          30 * time.Second,
 		DBDisconnectTimeout:       30 * time.Second,
+		DBRequestTimeout:          30 * time.Second,
 		DatabaseName:              "grader",
 		ServerShutdownTimeout:     5 * time.Second,
 		SessionCookieName:         "Grader",

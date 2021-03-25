@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api"
+	"github.com/ZdravkoGyurov/go-grader/pkg/api/req"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
 	"github.com/ZdravkoGyurov/go-grader/pkg/controller"
@@ -28,7 +29,14 @@ func (h *Submission) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := h.Controller.CreateSubmission(ctx, &submission); err != nil {
+	reqData, ok := req.GetRequestData(request)
+	if !ok {
+		err := errors.New("failed to retrieve github username")
+		response.SendError(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err := h.Controller.CreateSubmission(ctx, &submission, reqData.GithubUsername); err != nil {
 		response.SendError(writer, api.StatusCode(err), err)
 		return
 	}
