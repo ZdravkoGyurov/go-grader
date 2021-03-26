@@ -5,4 +5,4 @@ start-app:
 	go run cmd/go-grader/main.go
 
 start-app-in-docker:
-	docker build -t go-grader . && docker run -it -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock go-grader
+	docker build -t go-grader . && docker run --net gograder-mongo-cluster -it -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock go-grader

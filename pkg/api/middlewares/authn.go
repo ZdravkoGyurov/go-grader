@@ -27,7 +27,11 @@ func (m Authentication) Authenticate(next http.Handler) http.Handler {
 			response.SendError(writer, http.StatusInternalServerError, err)
 		}
 
-		request = req.AddPermissions(request, user.Permissions)
+		data := req.Data{
+			Permissions:    user.Permissions,
+			GithubUsername: user.GithubUsername,
+		}
+		request = req.AddRequestData(request, data)
 
 		next.ServeHTTP(writer, request)
 	})

@@ -3,10 +3,11 @@ package controller
 import (
 	"context"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/ZdravkoGyurov/go-grader/pkg/log"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 	"github.com/ZdravkoGyurov/go-grader/pkg/random"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (c *Controller) Login(ctx context.Context, username, password string) (string, error) {

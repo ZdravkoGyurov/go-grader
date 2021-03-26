@@ -5,17 +5,20 @@ import (
 	"net/http"
 )
 
-type permissionsKey struct{}
+type reqDataKey struct{}
 
-var (
-	PermissionsKey permissionsKey
-)
+var requestDataKey reqDataKey
 
-func AddPermissions(r *http.Request, permissions []string) *http.Request {
-	return r.WithContext(context.WithValue(r.Context(), PermissionsKey, permissions))
+type Data struct {
+	Permissions    []string
+	GithubUsername string
 }
 
-func GetPermissions(r *http.Request) ([]string, bool) {
-	permissions, ok := r.Context().Value(PermissionsKey).([]string)
-	return permissions, ok
+func AddRequestData(r *http.Request, data Data) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), requestDataKey, data))
+}
+
+func GetRequestData(r *http.Request) (Data, bool) {
+	data, ok := r.Context().Value(requestDataKey).(Data)
+	return data, ok
 }

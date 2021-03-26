@@ -1,18 +1,19 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/response"
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 )
 
 func PanicRecovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		defer func() {
-			err := recover()
-			if err != nil {
-				response.SendError(writer, http.StatusInternalServerError, fmt.Errorf("recovered from panic: %s", err))
+			r := recover()
+			if r != nil {
+				err := errors.Newf("recovered from panic %s", r)
+				response.SendError(writer, http.StatusInternalServerError, err)
 			}
 		}()
 

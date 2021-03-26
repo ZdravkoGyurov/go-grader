@@ -2,10 +2,8 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
-	"go.mongodb.org/mongo-driver/bson"
-
+	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 	"github.com/ZdravkoGyurov/go-grader/pkg/model"
 )
 
@@ -15,7 +13,7 @@ func (s *Storage) CreateSession(ctx context.Context, session *model.Session) err
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(sessionCollection)
 	_, err := collection.InsertOne(ctx, session)
 	if err != nil {
-		return fmt.Errorf("failed to insert session: %w", err)
+		return errors.Wrap(storageError(err), "failed to insert session")
 	}
 
 	return nil
@@ -24,8 +22,8 @@ func (s *Storage) CreateSession(ctx context.Context, session *model.Session) err
 func (s *Storage) ReadSession(ctx context.Context, sessionID string) (*model.Session, error) {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(sessionCollection)
 	var session model.Session
-	if err := collection.FindOne(ctx, bson.M{"_id": sessionID}).Decode(&session); err != nil {
-		return nil, fmt.Errorf("failed to find session with id %s: %w", sessionID, err)
+	if err := collection.FindOne(ctx, filterByID(sessionID)).Decode(&session); err != nil {
+		return nil, errors.Wrapf(storageError(err), "failed to find session with id %s", sessionID)
 	}
 
 	return &session, nil
@@ -33,8 +31,8 @@ func (s *Storage) ReadSession(ctx context.Context, sessionID string) (*model.Ses
 
 func (s *Storage) DeleteSession(ctx context.Context, sessionID string) error {
 	collection := s.mongoClient.Database(s.config.DatabaseName).Collection(sessionCollection)
-	if _, err := collection.DeleteOne(ctx, bson.M{"_id": sessionID}); err != nil {
-		return fmt.Errorf("failed to delete session with id %s: %w", sessionID, err)
+	if _, err := collection.DeleteOne(ctx, filterByID(sessionID)); err != nil {
+		return errors.Wrapf(storageError(err), "failed to delete session with id %s", err)
 	}
 
 	return nil
