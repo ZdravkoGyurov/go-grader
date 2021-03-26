@@ -41,7 +41,7 @@ func (h *Submission) Post(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	response.SendData(writer, http.StatusOK, struct{}{})
+	response.SendData(writer, http.StatusOK, submission)
 }
 
 func (h *Submission) GetAll(writer http.ResponseWriter, request *http.Request) {

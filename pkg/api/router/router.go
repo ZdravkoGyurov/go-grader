@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/ZdravkoGyurov/go-grader/pkg/api"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/handlers"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/middlewares"
 	"github.com/ZdravkoGyurov/go-grader/pkg/api/router/paths"
@@ -36,59 +37,59 @@ func setupAccountRoutes(r *mux.Router, ctrl *controller.Controller) {
 
 func setupAssignmentRoutes(r *mux.Router, ctrl *controller.Controller) {
 	assignmentHandler := &handlers.Assignment{Controller: ctrl}
-	authRouter(r, ctrl, middlewares.CreateAssignmentPermission).
+	authRouter(r, ctrl, api.CreateAssignmentPermission).
 		HandleFunc(paths.Assignment, assignmentHandler.Post).Methods(http.MethodPost)
 
-	authRouter(r, ctrl, middlewares.ReadAssignmentPermission).
+	authRouter(r, ctrl, api.ReadAssignmentPermission).
 		HandleFunc(paths.Assignment, assignmentHandler.GetAll).Methods(http.MethodGet)
 
-	authRouter(r, ctrl, middlewares.ReadAssignmentPermission).
+	authRouter(r, ctrl, api.ReadAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Get).Methods(http.MethodGet)
 
-	authRouter(r, ctrl, middlewares.UpdateAssignmentPermission).
+	authRouter(r, ctrl, api.UpdateAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Patch).Methods(http.MethodPatch)
 
-	authRouter(r, ctrl, middlewares.DeleteAssignmentPermission).
+	authRouter(r, ctrl, api.DeleteAssignmentPermission).
 		HandleFunc(paths.AssignmentWithID, assignmentHandler.Delete).Methods(http.MethodDelete)
 }
 
 func setupCourseRoutes(r *mux.Router, ctrl *controller.Controller) {
 	courseHandler := &handlers.Course{Controller: ctrl}
-	authRouter(r, ctrl, middlewares.CreateCoursePermission).
+	authRouter(r, ctrl, api.CreateCoursePermission).
 		HandleFunc(paths.Course, courseHandler.Post).Methods(http.MethodPost)
 
-	authRouter(r, ctrl, middlewares.ReadCoursePermission).
+	authRouter(r, ctrl, api.ReadCoursePermission).
 		HandleFunc(paths.Course, courseHandler.GetAll).Methods(http.MethodGet)
 
-	authRouter(r, ctrl, middlewares.ReadCoursePermission).
+	authRouter(r, ctrl, api.ReadCoursePermission).
 		HandleFunc(paths.CourseWithID, courseHandler.Get).Methods(http.MethodGet)
 
-	authRouter(r, ctrl, middlewares.UpdateCoursePermission).
+	authRouter(r, ctrl, api.UpdateCoursePermission).
 		HandleFunc(paths.CourseWithID, courseHandler.Patch).Methods(http.MethodPatch)
 
-	authRouter(r, ctrl, middlewares.DeleteAssignmentPermission).
+	authRouter(r, ctrl, api.DeleteAssignmentPermission).
 		HandleFunc(paths.CourseWithID, courseHandler.Delete).Methods(http.MethodDelete)
 }
 
 func setupSubmissionRoutes(r *mux.Router, ctrl *controller.Controller) {
 	submissionHandler := &handlers.Submission{Controller: ctrl}
-	authRouter(r, ctrl, middlewares.CreateSubmissionPermission).
+	authRouter(r, ctrl, api.CreateSubmissionPermission).
 		HandleFunc(paths.Submission, submissionHandler.Post).Methods(http.MethodPost)
-	authRouter(r, ctrl, middlewares.ReadSubmissionPermission).
+	authRouter(r, ctrl, api.ReadSubmissionPermission).
 		HandleFunc(paths.Submission, submissionHandler.GetAll).Methods(http.MethodGet)
-	authRouter(r, ctrl, middlewares.ReadSubmissionPermission).
+	authRouter(r, ctrl, api.ReadSubmissionPermission).
 		HandleFunc(paths.SubmissionWithID, submissionHandler.Get).Methods(http.MethodGet)
-	authRouter(r, ctrl, middlewares.UpdateSubmissionPermission).
+	authRouter(r, ctrl, api.UpdateSubmissionPermission).
 		HandleFunc(paths.SubmissionWithID, submissionHandler.Patch).Methods(http.MethodPatch)
-	authRouter(r, ctrl, middlewares.DeleteSubmissionPermission).
+	authRouter(r, ctrl, api.DeleteSubmissionPermission).
 		HandleFunc(paths.SubmissionWithID, submissionHandler.Delete).Methods(http.MethodDelete)
 }
 
 func setupUserRoutes(r *mux.Router, ctrl *controller.Controller) {
 	userHandler := &handlers.User{Controller: ctrl}
-	authRouter(r, ctrl, middlewares.ReadUsersPermission).HandleFunc(paths.User, userHandler.GetAll).Methods(http.MethodGet)
-	authRouter(r, ctrl, middlewares.UpdateUserPermission).HandleFunc(paths.UserWithID, userHandler.Patch).Methods(http.MethodPatch)
-	authRouter(r, ctrl, middlewares.DeleteUserPermission).HandleFunc(paths.UserWithID, userHandler.Delete).Methods(http.MethodDelete)
+	authRouter(r, ctrl, api.ReadUserPermission).HandleFunc(paths.User, userHandler.GetAll).Methods(http.MethodGet)
+	authRouter(r, ctrl, api.UpdateUserPermission).HandleFunc(paths.UserWithID, userHandler.Patch).Methods(http.MethodPatch)
+	authRouter(r, ctrl, api.DeleteUserPermission).HandleFunc(paths.UserWithID, userHandler.Delete).Methods(http.MethodDelete)
 }
 
 func authRouter(r *mux.Router, ctrl *controller.Controller, requiredPermissions ...string) *mux.Router {

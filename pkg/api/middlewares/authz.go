@@ -8,27 +8,6 @@ import (
 	"github.com/ZdravkoGyurov/go-grader/pkg/errors"
 )
 
-const (
-	CreateAssignmentPermission = "CREATE_ASSIGNMENT"
-	ReadAssignmentPermission   = "READ_ASSIGNMENT"
-	UpdateAssignmentPermission = "UPDATE_ASSIGNMENT"
-	DeleteAssignmentPermission = "DELETE_ASSIGNMENT"
-
-	CreateCoursePermission = "CREATE_COURSE"
-	ReadCoursePermission   = "READ_COURSE"
-	UpdateCoursePermission = "UPDATE_COURSE"
-	DeleteCoursePermission = "DELETE_COURSE"
-
-	CreateSubmissionPermission = "CREATE_SUBMISSION"
-	ReadSubmissionPermission   = "READ_SUBMISSION"
-	UpdateSubmissionPermission = "UPDATE_SUBMISSION"
-	DeleteSubmissionPermission = "DELETE_SUBMISSION"
-
-	ReadUsersPermission  = "READ_USERS"
-	UpdateUserPermission = "UPDATE_USER"
-	DeleteUserPermission = "DELETE_USER"
-)
-
 type Authorization struct {
 	RequiredPermissions []string
 }

@@ -16,55 +16,53 @@ func (c *Controller) CreateSubmission(ctx context.Context, submission *model.Sub
 	submission.Result = ""
 	submission.Status = "PENDING"
 
-	if err := c.storage.CreateSubmission(ctx, submission); err != nil {
-		return err
-	}
+	var (
+		assignmentName       string
+		courseGithubRepoName string
+	)
+	c.storage.Transaction(ctx, func(trxCtx context.Context) error {
+		if err := c.storage.CreateSubmission(ctx, submission); err != nil {
+			return err
+		}
+		assignment, err := c.storage.ReadAssignment(ctx, submission.AssignmentID)
+		if err != nil {
+			return err
+		}
+		course, err := c.storage.ReadCourse(ctx, assignment.CourseID)
+		if err != nil {
+			return err
+		}
+
+		assignmentName = assignment.Name
+		courseGithubRepoName = course.GithubRepoName
+		return nil
+	})
 
 	jobName := "run tests in docker"
 	jobFunc := func() {
-		trxCtx, cancelDBReq := context.WithTimeout(context.Background(), c.Config.DBRequestTimeout)
-		defer cancelDBReq()
-		c.storage.Transaction(trxCtx, func(ctx context.Context) error {
-			assignment, err := c.storage.ReadAssignment(ctx, submission.AssignmentID)
-			if err != nil {
-				return err
-			}
-			course, err := c.storage.ReadCourse(ctx, assignment.CourseID)
-			if err != nil {
-				return err
-			}
+		testsConfig := dexec.TestsRunConfig{
+			ImageName:       random.LowercaseString(10),
+			ContainerName:   random.LowercaseString(10),
+			Assignment:      assignmentName,
+			SolutionGitUser: githubUsername,
+			SolutionGitRepo: courseGithubRepoName,
+			TestsGitUser:    c.Config.TestsGitUser,
+			TestsGitRepo:    c.Config.TestsGitRepo,
+		}
 
-			testsConfig := dexec.TestsRunConfig{
-				ImageName:       random.LowercaseString(10),
-				ContainerName:   random.LowercaseString(10),
-				Assignment:      assignment.Name,
-				SolutionGitUser: githubUsername,
-				SolutionGitRepo: course.GithubRepoName,
-				TestsGitUser:    c.Config.TestsGitUser,
-				TestsGitRepo:    c.Config.TestsGitRepo,
-			}
+		output, err := dexec.RunTests(testsConfig)
+		if err != nil {
+			log.Error().Println(err)
+		}
 
-			// maybe stop transaction
-			output, err := dexec.RunTests(testsConfig)
-			if err != nil {
-				log.Error().Println(err)
-				log.Error().Println(output)
-				return err
-			}
-
-			submission.Result = output
-			submission.Status = "DONE"
-			updateCtx, cancelUpdate := context.WithTimeout(context.Background(), 30*time.Second)
-			defer cancelUpdate()
-			_, err = c.UpdateSubmission(updateCtx, submission.ID, submission)
-			if err != nil {
-				log.Error().Println(err)
-				return err
-			}
-
-			return nil
-		})
-
+		submission.Result = output
+		submission.Status = "DONE"
+		updateCtx, cancelUpdate := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancelUpdate()
+		_, err = c.UpdateSubmission(updateCtx, submission.ID, submission)
+		if err != nil {
+			log.Error().Println(err)
+		}
 	}
 	_, err := c.executor.QueueJob(jobName, jobFunc)
 	if err != nil {
